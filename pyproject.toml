@@ -1,0 +1,115 @@
+[tool.poetry]
+name = "min-ratio-cycle"
+version = "0.1.0"
+description = "Minimum cost-to-time ratio cycle solver with NumPy acceleration and exact Stern–Brocot search for integer inputs."
+authors = ["Diogo Ribeiro <dfr@esmad.ipp.pt>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "min_ratio_cycle" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.25"
+matplotlib = "^3.7"  # For benchmark plotting
+networkx = "^3.2"
+psutil = "^7.0"  # Resource monitoring
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+hypothesis = "^6.100"  # Property-based testing
+pytest-cov = "^4.1"    # Coverage reporting
+pytest-benchmark = "^4.0"  # Performance benchmarking
+pytest-xdist = "^3.3"  # Parallel test execution
+black = "^23.0"        # Code formatting
+isort = "^5.12"        # Import sorting
+mypy = "^1.5"          # Type checking
+flake8 = "^6.0"        # Linting
+sphinx = "^7.0"        # Documentation generator
+pre-commit = "^3.5"    # Git hook management
+bandit = "^1.7"        # Security scanning
+
+[tool.poetry.group.test.dependencies]
+# Additional test utilities
+pytest-mock = "^3.11"
+pytest-timeout = "^2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# Tool configurations
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["min_ratio_cycle"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "matplotlib.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "benchmark: marks tests as benchmarks",
+    "property: marks property-based tests",
+    "integration: marks integration tests",
+]
+
+[tool.coverage.run]
+source = ["min_ratio_cycle"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

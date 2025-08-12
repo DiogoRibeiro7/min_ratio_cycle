@@ -1,0 +1,5 @@
+{
+  "api": ["MinRatioCycleSolver", "Edge"],
+  "ratio": 1.0,
+  "times": [0.0173, 0.0145, 0.0159]
+}

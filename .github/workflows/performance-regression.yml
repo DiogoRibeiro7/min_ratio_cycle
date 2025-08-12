@@ -1,0 +1,52 @@
+name: Performance Regression Test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.local/share/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: ${{ runner.os }}-poetry-
+      - name: Install dependencies
+        run: poetry install
+      - name: Run benchmarks on current commit
+        run: poetry run pytest tests/test_performance.py --benchmark-json current.json
+      - name: Run benchmarks on previous commit
+        run: |
+          git checkout HEAD~1
+          poetry lock
+          poetry install
+          poetry run pytest tests/test_performance.py --benchmark-json previous.json
+      - name: Compare performance
+        run: |
+          poetry run python - <<'PY'
+          import json, sys
+          with open('previous.json') as f: prev = json.load(f)
+          with open('current.json') as f: curr = json.load(f)
+          def mean(data):
+              return data['benchmarks'][0]['stats']['mean']
+          prev_mean = mean(prev)
+          curr_mean = mean(curr)
+          if curr_mean > prev_mean * 1.10:
+              print(f"Performance regression detected: {curr_mean} > {prev_mean}")
+              sys.exit(1)
+          print("No significant performance regression")
+          PY
