@@ -67,7 +67,7 @@ Pre-built test graphs for common scenarios:
 Specialized validation helpers:
 ```python
 def assert_valid_cycle(cycle, n_vertices)
-def assert_positive_time(sum_time) 
+def assert_positive_time(sum_time)
 def assert_ratio_consistency(cost, time, ratio)
 ```
 
@@ -126,7 +126,7 @@ python run_tests.py --parallel --coverage
 ### Test Markers
 Tests are categorized with pytest markers:
 - `@pytest.mark.slow`: Long-running tests
-- `@pytest.mark.benchmark`: Performance tests  
+- `@pytest.mark.benchmark`: Performance tests
 - `@pytest.mark.property`: Property-based tests
 - `@pytest.mark.integration`: End-to-end tests
 
@@ -144,7 +144,7 @@ The benchmark suite provides detailed analysis:
 
 ### Graph Topologies Tested
 1. **Random sparse** (10% density)
-2. **Random dense** (30-50% density)  
+2. **Random dense** (30-50% density)
 3. **Complete graphs** (100% density, smaller sizes)
 4. **Grid graphs** (2D lattice structure)
 5. **Cycle graphs** (Simple ring topology)
@@ -153,7 +153,7 @@ The benchmark suite provides detailed analysis:
 ### Scaling Analysis
 Tests graph sizes from 10 to 100+ vertices and generates plots showing:
 - Time vs vertices (log scale)
-- Time vs edge count  
+- Time vs edge count
 - Memory vs graph size
 - Exact vs numeric mode comparison
 
@@ -165,9 +165,9 @@ For critical test cases, we manually verify results:
 ```python
 def validate_cycle(self, solver, cycle, expected_cost, expected_time, expected_ratio):
     # Walk through cycle edges manually
-    actual_cost = sum(edge_costs_in_cycle) 
+    actual_cost = sum(edge_costs_in_cycle)
     actual_time = sum(edge_times_in_cycle)
-    
+
     # Verify against solver output
     assert abs(actual_cost - expected_cost) < 1e-10
     assert abs(actual_ratio - expected_ratio) < 1e-10
@@ -184,7 +184,7 @@ Every valid solution must satisfy:
 ### Known Solution Tests
 Test cases with predetermined correct answers:
 - Simple triangles with calculated optimal ratios
-- Negative cost cycles 
+- Negative cost cycles
 - Self-loops (trivial cycles)
 - Disconnected components (should find global optimum)
 
@@ -249,10 +249,10 @@ def test_new_feature(self, graph_fixture, graph_assertions):
     """Test description explaining what we're validating."""
     # Arrange
     solver = setup_test_case()
-    
-    # Act  
+
+    # Act
     cycle, cost, time, ratio = solver.solve()
-    
+
     # Assert
     graph_assertions.assert_valid_cycle(cycle, solver.n)
     assert specific_property_holds(cycle, cost, time, ratio)
@@ -263,7 +263,7 @@ def test_new_feature(self, graph_fixture, graph_assertions):
 
 ### Common Issues
 1. **Numerical precision**: Use appropriate tolerances (1e-10 for exact, 1e-6 for numeric)
-2. **Random test failures**: Set `np.random.seed()` for reproducibility  
+2. **Random test failures**: Set `np.random.seed()` for reproducibility
 3. **Performance regressions**: Compare against baseline times
 4. **Memory leaks**: Check peak memory doesn't grow unexpectedly
 
@@ -275,7 +275,7 @@ pytest test_solver.py::TestEdgeCases::test_self_loop -v -s
 # Drop into debugger on failure
 pytest --pdb
 
-# Show local variables on failure  
+# Show local variables on failure
 pytest --tb=long
 
 # Profile slow tests

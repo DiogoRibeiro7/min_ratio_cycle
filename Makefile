@@ -141,7 +141,7 @@ import subprocess
 import sys
 
 try:
-    result = subprocess.run(['pytest', '--collect-only', '-q'], 
+    result = subprocess.run(['pytest', '--collect-only', '-q'],
                           capture_output=True, text=True)
     lines = result.stdout.strip().split('\n')
     for line in lines[-5:]:
@@ -165,7 +165,7 @@ print(f'  Memory: {psutil.virtual_memory().total // (1024**3)}GB')
 print()
 
 start_time = time.time()
-result = subprocess.run(['python', 'run_tests.py', '--quick'], 
+result = subprocess.run(['python', 'run_tests.py', '--quick'],
                        capture_output=True)
 elapsed = time.time() - start_time
 
