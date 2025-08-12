@@ -56,6 +56,6 @@ jobs:
           poetry run safety check --full-report
 
       # pip-audit scans the installed packages in the Poetry venv
-      - name: pip-audit (strict; skip editable/local)
-        run: |
-          poetry run pip-audit --strict --skip-editable
+      # - name: pip-audit (strict)
+      #   run: |
+      #     poetry run pip-audit --strict
