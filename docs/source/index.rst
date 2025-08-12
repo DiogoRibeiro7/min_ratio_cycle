@@ -5,6 +5,7 @@ Welcome to Min Ratio Cycle's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    algorithm
    usage
    user_guide
