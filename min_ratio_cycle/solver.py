@@ -666,7 +666,10 @@ class MinRatioCycleSolver:
                 error_message="Exact mode requires integer weights",
             )
 
-        assert self._Ci is not None and self._Ti is not None
+        if self._Ci is None or self._Ti is None:
+            raise RuntimeError(
+                "Integer weight arrays (_Ci, _Ti) must be initialized before solving"
+            )
 
         max_den = kwargs.get("max_denominator", self.config.exact_max_denominator)
         max_steps = kwargs.get("max_steps", self.config.exact_max_steps)
@@ -702,7 +705,10 @@ class MinRatioCycleSolver:
         self, max_den: Optional[int], max_steps: Optional[int]
     ) -> Tuple[List[int], int, int, Tuple[int, int], float]:
         """Implement Stern-Brocot tree search for exact optimal ratio."""
-        assert self._Ci is not None and self._Ti is not None
+        if self._Ci is None or self._Ti is None:
+            raise RuntimeError(
+                "Integer weight arrays (_Ci, _Ti) must be initialized before searching"
+            )
 
         # Set defaults
         if max_den is None:
@@ -772,9 +778,18 @@ class MinRatioCycleSolver:
 
     def _has_negative_cycle_exact(self, a: int, b: int) -> bool:
         """Check for negative cycle with exact integer arithmetic."""
-        assert self._U is not None and self._V is not None
-        assert self._Ci is not None and self._Ti is not None
-        assert self._starts is not None and self._counts is not None
+        if self._U is None or self._V is None:
+            raise RuntimeError(
+                "Edge endpoint arrays (_U, _V) must be initialized before cycle checks"
+            )
+        if self._Ci is None or self._Ti is None:
+            raise RuntimeError(
+                "Integer weight arrays (_Ci, _Ti) must be initialized before cycle checks"
+            )
+        if self._starts is None or self._counts is None:
+            raise RuntimeError(
+                "Segment arrays (_starts, _counts) must be initialized before cycle checks"
+            )
 
         W = self._combine_weights_exact(a, b)
         dist = np.zeros(self.n, dtype=np.int64)
@@ -815,8 +830,14 @@ class MinRatioCycleSolver:
         if not ok:
             return None
 
-        assert self._U is not None and self._V is not None
-        assert self._Ci is not None and self._Ti is not None
+        if self._U is None or self._V is None:
+            raise RuntimeError(
+                "Edge endpoint arrays (_U, _V) must be initialized before cycle extraction"
+            )
+        if self._Ci is None or self._Ti is None:
+            raise RuntimeError(
+                "Integer weight arrays (_Ci, _Ti) must be initialized before cycle extraction"
+            )
 
         W = self._combine_weights_exact(a, b)
         equal_mask = (dist[self._U] + W) == dist[self._V]
@@ -864,9 +885,18 @@ class MinRatioCycleSolver:
 
     def _compute_potentials_exact(self, a: int, b: int) -> Tuple[bool, np.ndarray]:
         """Compute shortest path potentials with exact arithmetic."""
-        assert self._U is not None and self._V is not None
-        assert self._Ci is not None and self._Ti is not None
-        assert self._starts is not None and self._counts is not None
+        if self._U is None or self._V is None:
+            raise RuntimeError(
+                "Edge endpoint arrays (_U, _V) must be initialized before computing potentials"
+            )
+        if self._Ci is None or self._Ti is None:
+            raise RuntimeError(
+                "Integer weight arrays (_Ci, _Ti) must be initialized before computing potentials"
+            )
+        if self._starts is None or self._counts is None:
+            raise RuntimeError(
+                "Segment arrays (_starts, _counts) must be initialized before computing potentials"
+            )
 
         W = self._combine_weights_exact(a, b)
         dist = np.zeros(self.n, dtype=np.int64)
@@ -1053,9 +1083,18 @@ class MinRatioCycleSolver:
         self, lam: float, slack: float = 0.0
     ) -> Tuple[bool, Optional[Tuple[List[int], float, float, float]]]:
         """Detect negative cycle using vectorized Bellman-Ford."""
-        assert self._U is not None and self._V is not None
-        assert self._C is not None and self._T is not None
-        assert self._starts is not None and self._counts is not None
+        if self._U is None or self._V is None:
+            raise RuntimeError(
+                "Edge endpoint arrays (_U, _V) must be initialized before numeric cycle detection"
+            )
+        if self._C is None or self._T is None:
+            raise RuntimeError(
+                "Weight arrays (_C, _T) must be initialized before numeric cycle detection"
+            )
+        if self._starts is None or self._counts is None:
+            raise RuntimeError(
+                "Segment arrays (_starts, _counts) must be initialized before numeric cycle detection"
+            )
 
         n = self.n
         W = self._C - lam * self._T
