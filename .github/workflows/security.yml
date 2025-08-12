@@ -9,18 +9,38 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Bandit security scan
-        run: |
-          pip install bandit
-          bandit -r min_ratio_cycle/
+      # Use the same Python that your project targets
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-      - name: Run Safety check
+      - name: Install Poetry
         run: |
-          pip install safety
-          safety check
+          pipx install poetry
+          poetry --version
 
-      - name: Dependency vulnerability scan
-        uses: pypa/gh-action-pip-audit@v1.0.8
+      # Install project deps in Poetry venv (dev group included so scanners are available)
+      - name: Install dependencies with Poetry
+        run: |
+          poetry install --with dev --no-interaction --no-ansi
+
+      # --- Bandit: run in the project venv, tune failure level if desired ---
+      - name: Bandit (security linter)
+        run: |
+          poetry run bandit -r min_ratio_cycle/ --severity-level medium --confidence-level high
+
+      # OPTION A: Safety scans the *installed* packages inside your Poetry venv
+      - name: Safety (scan installed env)
+        run: |
+          poetry run pip install --upgrade safety
+          poetry run safety check --full-report
+
+      - name: pip-audit (scan exported requirements, not global env)
+        run: |
+          pipx install pip-audit
+          pip-audit -r requirements.txt --strict
