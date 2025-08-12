@@ -9,18 +9,53 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Run Bandit security scan
+
+      # Match your project target
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Poetry
         run: |
-          pip install bandit
-          bandit -r min_ratio_cycle/
-      
-      - name: Run Safety check
+          pipx install poetry
+          poetry --version
+
+      # (Optional) cache to speed up installs
+      - name: Cache Poetry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.local/share/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: ${{ runner.os }}-poetry-
+
+      # Install your project + dev tools in the Poetry venv
+      - name: Install dependencies with Poetry
         run: |
-          pip install safety
-          safety check
-      
-      - name: Dependency vulnerability scan
-        uses: pypa/gh-action-pip-audit@v1.0.8
+          poetry install --with dev --no-interaction --no-ansi
+
+      # Keep the venv's tooling up to date (reduces false positives)
+      - name: Update security tooling in venv
+        run: |
+          poetry run python -m pip install --upgrade pip setuptools wheel
+          poetry run python -m pip install --upgrade safety pip-audit
+
+      # Bandit scans your source tree
+      - name: Bandit (security linter)
+        run: |
+          poetry run bandit -r min_ratio_cycle/ --severity-level medium --confidence-level high
+
+      # Safety scans the installed packages in the Poetry venv
+      - name: Safety (scan installed env)
+        run: |
+          poetry run safety check --full-report
+
+      # pip-audit scans the installed packages in the Poetry venv
+      # - name: pip-audit (strict)
+      #   run: |
+      #     poetry run pip-audit --strict
