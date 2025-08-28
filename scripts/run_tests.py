@@ -23,7 +23,9 @@ from pathlib import Path
 
 
 def run_command(cmd: list, description: str, verbose: bool = False):
-    """Run a command and handle errors."""
+    """
+    Run a command and handle errors.
+    """
     if verbose:
         print(f"Running: {' '.join(cmd)}")
 
@@ -148,7 +150,7 @@ def main():
 
     # Additional operations
     if args.coverage:
-        print(f"\n📊 Coverage report generated in htmlcov/")
+        print("\n📊 Coverage report generated in htmlcov/")
 
     # Run benchmarks if requested
     if args.bench:

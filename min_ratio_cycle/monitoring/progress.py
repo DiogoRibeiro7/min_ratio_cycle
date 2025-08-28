@@ -5,8 +5,9 @@ from contextlib import contextmanager
 # Missing: Progress tracking for long operations
 @contextmanager
 def progress_tracker(description, total_steps=None):
-    """Context manager for tracking progress of long operations."""
-    import sys
+    """
+    Context manager for tracking progress of long operations.
+    """
 
     print(f"\n{description}...", end="", flush=True)
     start_time = time.time()

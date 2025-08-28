@@ -5,19 +5,21 @@ These tests focus on end-to-end behavior and real-world scenarios.
 """
 
 import math
-from typing import List, Tuple
 
-import numpy as np
 import pytest
 
 from min_ratio_cycle.solver import MinRatioCycleSolver
 
 
 class TestIntegration:
-    """Integration tests for complete solver functionality."""
+    """
+    Integration tests for complete solver functionality.
+    """
 
     def test_simple_known_solution(self, simple_triangle, graph_assertions):
-        """Test solver on simple graph with known optimal solution."""
+        """
+        Test solver on simple graph with known optimal solution.
+        """
         solver, expected_ratio = simple_triangle
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -33,7 +35,9 @@ class TestIntegration:
         ), f"Found ratio {ratio} is worse than expected {expected_ratio}"
 
     def test_negative_cost_cycle(self, negative_cycle, graph_assertions):
-        """Test with negative cost cycles."""
+        """
+        Test with negative cost cycles.
+        """
         solver, expected_ratio = negative_cycle
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -47,7 +51,9 @@ class TestIntegration:
         assert abs(ratio - expected_ratio) < 1e-6
 
     def test_mode_selection_integer(self, integer_weights_only):
-        """Test automatic selection of exact mode for integer weights."""
+        """
+        Test automatic selection of exact mode for integer weights.
+        """
         solver = integer_weights_only
 
         # Verify it's detected as integer mode
@@ -65,7 +71,9 @@ class TestIntegration:
         assert sum_time == int(sum_time), "Time should be integer value"
 
     def test_mode_selection_float(self, float_weights):
-        """Test automatic selection of numeric mode for float weights."""
+        """
+        Test automatic selection of numeric mode for float weights.
+        """
         solver = float_weights
 
         # Verify it's detected as float mode
@@ -79,7 +87,9 @@ class TestIntegration:
         assert math.isfinite(ratio)
 
     def test_disconnected_components(self, disconnected_graph, graph_assertions):
-        """Test solver finds optimal cycle across disconnected components."""
+        """
+        Test solver finds optimal cycle across disconnected components.
+        """
         solver, expected_ratio = disconnected_graph
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -92,7 +102,9 @@ class TestIntegration:
         assert abs(ratio - expected_ratio) < 1e-6
 
     def test_complete_graphs(self, complete_graph, graph_assertions):
-        """Test solver on complete graphs of various sizes."""
+        """
+        Test solver on complete graphs of various sizes.
+        """
         solver = complete_graph
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -105,7 +117,9 @@ class TestIntegration:
         assert math.isfinite(ratio)
 
     def test_parallel_edges_handling(self, parallel_edges_graph, graph_assertions):
-        """Test correct handling of parallel edges."""
+        """
+        Test correct handling of parallel edges.
+        """
         solver = parallel_edges_graph
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -119,7 +133,9 @@ class TestIntegration:
 
     @pytest.mark.slow
     def test_large_graph_performance(self, large_graph, graph_assertions):
-        """Test solver performance on larger graphs."""
+        """
+        Test solver performance on larger graphs.
+        """
         import time
 
         solver = large_graph
@@ -138,7 +154,9 @@ class TestIntegration:
         print(f"Large graph (n={solver.n}) solved in {elapsed:.4f}s")
 
     def test_pathological_case(self, pathological_graph, graph_assertions):
-        """Test solver on pathologically difficult graph."""
+        """
+        Test solver on pathologically difficult graph.
+        """
         solver = pathological_graph
 
         cycle, sum_cost, sum_time, ratio = solver.solve()
@@ -152,10 +170,14 @@ class TestIntegration:
 
 
 class TestRealWorldScenarios:
-    """Tests based on real-world applications."""
+    """
+    Tests based on real-world applications.
+    """
 
     def test_arbitrage_detection(self):
-        """Test currency arbitrage detection scenario."""
+        """
+        Test currency arbitrage detection scenario.
+        """
         # Simplified currency exchange graph
         # Vertices: 0=USD, 1=EUR, 2=GBP, 3=JPY
         solver = MinRatioCycleSolver(4)
@@ -180,7 +202,9 @@ class TestRealWorldScenarios:
         # But test structure is more important than specific values
 
     def test_resource_scheduling(self):
-        """Test resource scheduling optimization."""
+        """
+        Test resource scheduling optimization.
+        """
         # Graph where vertices are tasks, edges are dependencies
         # Cost = resource usage, Time = duration
         solver = MinRatioCycleSolver(5)
@@ -210,7 +234,9 @@ class TestRealWorldScenarios:
         )
 
     def test_network_routing(self):
-        """Test network routing with cost and latency."""
+        """
+        Test network routing with cost and latency.
+        """
         # Network nodes with routing costs and latencies
         solver = MinRatioCycleSolver(6)
 
@@ -244,7 +270,9 @@ class TestRealWorldScenarios:
         )
 
     def test_manufacturing_process(self):
-        """Test manufacturing process optimization."""
+        """
+        Test manufacturing process optimization.
+        """
         # Manufacturing stages with setup costs and processing times
         solver = MinRatioCycleSolver(4)
 
@@ -271,10 +299,14 @@ class TestRealWorldScenarios:
 
 
 class TestEdgeConfiguration:
-    """Test various edge configurations and graph properties."""
+    """
+    Test various edge configurations and graph properties.
+    """
 
     def test_self_loops_only(self):
-        """Test graph with only self-loops."""
+        """
+        Test graph with only self-loops.
+        """
         solver = MinRatioCycleSolver(3)
 
         # Each vertex has a self-loop
@@ -290,7 +322,9 @@ class TestEdgeConfiguration:
         assert abs(ratio - 1.5) < 1e-10  # Best ratio is vertex 1
 
     def test_star_topology(self):
-        """Test star topology (one central vertex)."""
+        """
+        Test star topology (one central vertex).
+        """
         n = 6
         center = 0
         solver = MinRatioCycleSolver(n)
@@ -313,7 +347,9 @@ class TestEdgeConfiguration:
         assert center in cycle[:-1]  # Center should be in the cycle
 
     def test_bipartite_graph(self):
-        """Test bipartite graph structure."""
+        """
+        Test bipartite graph structure.
+        """
         # Vertices 0,1,2 in one set, 3,4,5 in other set
         solver = MinRatioCycleSolver(6)
 
@@ -334,7 +370,9 @@ class TestEdgeConfiguration:
         assert (len(cycle) - 1) % 2 == 0, "Bipartite graph cycles must have even length"
 
     def test_layered_graph(self):
-        """Test layered/hierarchical graph structure."""
+        """
+        Test layered/hierarchical graph structure.
+        """
         layers = 4
         nodes_per_layer = 3
         n = layers * nodes_per_layer
@@ -377,10 +415,14 @@ class TestEdgeConfiguration:
 
 
 class TestNumericalStability:
-    """Test numerical stability and precision issues."""
+    """
+    Test numerical stability and precision issues.
+    """
 
     def test_very_small_differences(self):
-        """Test with very small differences between edge weights."""
+        """
+        Test with very small differences between edge weights.
+        """
         solver = MinRatioCycleSolver(3)
 
         eps = 1e-12
@@ -399,7 +441,9 @@ class TestNumericalStability:
         assert abs(ratio - 1.0) < 1e-10
 
     def test_mixed_scales(self):
-        """Test with very different weight scales."""
+        """
+        Test with very different weight scales.
+        """
         solver = MinRatioCycleSolver(3)
 
         large = 1e6
@@ -419,7 +463,9 @@ class TestNumericalStability:
         print(f"Mixed scales result: ratio = {ratio:.6e}")
 
     def test_near_zero_ratio(self):
-        """Test graphs with near-zero optimal ratio."""
+        """
+        Test graphs with near-zero optimal ratio.
+        """
         solver = MinRatioCycleSolver(4)
 
         # Create cycle with costs that nearly cancel out
@@ -440,10 +486,14 @@ class TestNumericalStability:
 
 
 class TestEndToEndWorkflows:
-    """End-to-end tests covering full solver workflow and error propagation."""
+    """
+    End-to-end tests covering full solver workflow and error propagation.
+    """
 
     def test_dimacs_benchmark_end_to_end(self):
-        """Load DIMACS data, solve, and validate performance metrics."""
+        """
+        Load DIMACS data, solve, and validate performance metrics.
+        """
         import psutil
 
         from min_ratio_cycle.benchmarks import benchmark_solver, load_dimacs_graph
@@ -465,7 +515,9 @@ class TestEndToEndWorkflows:
         assert after - before < 50 * 1024 * 1024
 
     def test_solver_deterministic_results(self):
-        """Solver should produce consistent results across runs."""
+        """
+        Solver should produce consistent results across runs.
+        """
         edges = [(0, 1, 1.0, 1.0), (1, 2, 1.0, 1.0), (2, 0, 1.0, 1.0)]
         s1 = MinRatioCycleSolver(3)
         s1.add_edges(edges)
@@ -474,7 +526,9 @@ class TestEndToEndWorkflows:
         assert s1.solve().ratio == s2.solve().ratio
 
     def test_error_propagation_disconnected(self):
-        """Disconnected graphs surface solver errors with context."""
+        """
+        Disconnected graphs surface solver errors with context.
+        """
         from min_ratio_cycle.benchmarks import benchmark_solver, load_dimacs_graph
         from min_ratio_cycle.exceptions import SolverError
 

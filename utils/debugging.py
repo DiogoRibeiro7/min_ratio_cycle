@@ -1,18 +1,18 @@
 """
 Debugging utilities for min-ratio-cycle solver.
 
-This module provides comprehensive debugging and diagnostic tools
-to help identify and resolve issues with solver performance,
-graph structure problems, and algorithm failures.
+This module provides comprehensive debugging and diagnostic tools to
+help identify and resolve issues with solver performance, graph
+structure problems, and algorithm failures.
 """
 
 import time
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 # Import exceptions for proper error reporting
-from min_ratio_cycle.exceptions import GraphError, SolverError, ValidationError
+from min_ratio_cycle.exceptions import SolverError
 
 # Type checking imports to avoid circular imports
 if TYPE_CHECKING:
@@ -24,8 +24,8 @@ class SolverDebugger:
     Comprehensive debugging utilities for solver issues.
 
     This class provides tools to analyze graph properties, detect
-    potential issues, and generate detailed diagnostic reports
-    to help troubleshoot solver problems.
+    potential issues, and generate detailed diagnostic reports to help
+    troubleshoot solver problems.
     """
 
     def __init__(self, solver: "MinRatioCycleSolver"):
@@ -36,10 +36,10 @@ class SolverDebugger:
             solver: The MinRatioCycleSolver instance to debug
         """
         self.solver = solver
-        self._analysis_cache: Dict[str, Any] = {}
+        self._analysis_cache: dict[str, Any] = {}
         self._cache_timestamp: float = 0.0
 
-    def analyze_graph_properties(self, use_cache: bool = True) -> Dict[str, Any]:
+    def analyze_graph_properties(self, use_cache: bool = True) -> dict[str, Any]:
         """
         Analyze comprehensive graph properties for debugging.
 
@@ -121,9 +121,11 @@ class SolverDebugger:
                 },
                 "numerical_properties": {
                     "cost_range_magnitude": float(np.max(costs) - np.min(costs)),
-                    "time_ratio_magnitude": float(np.max(times) / np.min(times))
-                    if np.min(times) > 0
-                    else float("inf"),
+                    "time_ratio_magnitude": (
+                        float(np.max(times) / np.min(times))
+                        if np.min(times) > 0
+                        else float("inf")
+                    ),
                     "potential_precision_issues": self._check_numerical_precision(
                         costs, times
                     ),
@@ -149,7 +151,7 @@ class SolverDebugger:
                 "exception_type": type(e).__name__,
             }
 
-    def detect_potential_issues(self) -> List[Dict[str, str]]:
+    def detect_potential_issues(self) -> list[dict[str, str]]:
         """
         Detect potential issues that might cause solve failures.
 
@@ -407,8 +409,10 @@ class SolverDebugger:
 
         return "\n".join(report_lines)
 
-    def _analyze_connectivity(self) -> Dict[str, Any]:
-        """Analyze graph connectivity properties."""
+    def _analyze_connectivity(self) -> dict[str, Any]:
+        """
+        Analyze graph connectivity properties.
+        """
         try:
             # Simple weakly connected check
             n = self.solver.n
@@ -417,7 +421,9 @@ class SolverDebugger:
             visited = np.zeros(n, dtype=bool)
 
             def dfs(v: int) -> int:
-                """DFS to count reachable vertices."""
+                """
+                DFS to count reachable vertices.
+                """
                 visited[v] = True
                 count = 1
 
@@ -451,8 +457,10 @@ class SolverDebugger:
         except Exception:
             return {"weakly_connected": "Unknown", "analysis_error": True}
 
-    def _analyze_cycle_potential(self) -> Dict[str, Any]:
-        """Analyze potential for cycles in the graph."""
+    def _analyze_cycle_potential(self) -> dict[str, Any]:
+        """
+        Analyze potential for cycles in the graph.
+        """
         try:
             # Simple heuristics for cycle potential
             n = self.solver.n
@@ -468,9 +476,9 @@ class SolverDebugger:
 
             return {
                 "minimum_cycle_possible": has_enough_edges or has_self_loops,
-                "edges_needed_for_cycle": max(0, min_edges_for_cycle - m)
-                if not has_self_loops
-                else 0,
+                "edges_needed_for_cycle": (
+                    max(0, min_edges_for_cycle - m) if not has_self_loops else 0
+                ),
                 "self_loops_present": has_self_loops,
                 "cycle_likelihood": "High" if has_enough_edges else "Low",
             }
@@ -479,7 +487,9 @@ class SolverDebugger:
             return {"analysis_error": True}
 
     def _count_parallel_edges(self) -> int:
-        """Count parallel edges (multiple edges between same vertex pairs)."""
+        """
+        Count parallel edges (multiple edges between same vertex pairs).
+        """
         try:
             edge_counts = {}
             for edge in self.solver._edges:
@@ -491,14 +501,18 @@ class SolverDebugger:
             return 0
 
     def _count_self_loops(self) -> int:
-        """Count self-loops (edges from vertex to itself)."""
+        """
+        Count self-loops (edges from vertex to itself).
+        """
         try:
             return sum(1 for edge in self.solver._edges if edge.u == edge.v)
         except Exception:
             return 0
 
     def _check_numerical_precision(self, costs: np.ndarray, times: np.ndarray) -> bool:
-        """Check for potential numerical precision issues."""
+        """
+        Check for potential numerical precision issues.
+        """
         try:
             # Check for very large or very small values
             cost_range = np.max(costs) - np.min(costs)
@@ -517,7 +531,9 @@ class SolverDebugger:
             return False
 
     def _estimate_condition_number(self, costs: np.ndarray, times: np.ndarray) -> float:
-        """Estimate condition number for numerical stability assessment."""
+        """
+        Estimate condition number for numerical stability assessment.
+        """
         try:
             # Simple heuristic based on weight ranges
             if len(costs) == 0 or len(times) == 0:
@@ -534,9 +550,11 @@ class SolverDebugger:
             return 1.0
 
     def _generate_recommendations(
-        self, props: Dict[str, Any], issues: List[Dict[str, str]]
-    ) -> List[str]:
-        """Generate actionable recommendations based on analysis."""
+        self, props: dict[str, Any], issues: list[dict[str, str]]
+    ) -> list[str]:
+        """
+        Generate actionable recommendations based on analysis.
+        """
         recommendations = []
 
         if "error" in props:
@@ -581,18 +599,24 @@ class SolverDebugger:
         return recommendations
 
     def clear_cache(self) -> None:
-        """Clear analysis cache to force fresh analysis."""
+        """
+        Clear analysis cache to force fresh analysis.
+        """
         self._analysis_cache.clear()
         self._cache_timestamp = 0.0
 
-    def get_solver_state_summary(self) -> Dict[str, Any]:
-        """Get a quick summary of solver state for debugging."""
+    def get_solver_state_summary(self) -> dict[str, Any]:
+        """
+        Get a quick summary of solver state for debugging.
+        """
         return {
             "n_vertices": self.solver.n,
             "n_edges": len(self.solver._edges),
-            "arrays_built": self.solver._arrays_built
-            if hasattr(self.solver, "_arrays_built")
-            else False,
+            "arrays_built": (
+                self.solver._arrays_built
+                if hasattr(self.solver, "_arrays_built")
+                else False
+            ),
             "integer_mode": self.solver._all_int,
             "config_present": hasattr(self.solver, "config")
             and self.solver.config is not None,
@@ -627,7 +651,7 @@ def quick_debug(solver: "MinRatioCycleSolver") -> str:
 
 
 def diagnose_solve_failure(
-    solver: "MinRatioCycleSolver", exception: Optional[Exception] = None
+    solver: "MinRatioCycleSolver", exception: Exception | None = None
 ) -> str:
     """
     Diagnose why a solve operation failed.
@@ -643,7 +667,7 @@ def diagnose_solve_failure(
     report = debugger.generate_debug_report(include_detailed_analysis=True)
 
     if exception:
-        report += f"\n\nException Details:\n"
+        report += "\n\nException Details:\n"
         report += f"Exception type: {type(exception).__name__}\n"
         report += f"Exception message: {str(exception)}\n"
 

@@ -15,7 +15,7 @@ import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional
 
 try:
     import psutil
@@ -34,7 +34,9 @@ except ImportError:
 
 @dataclass
 class SolveMetrics:
-    """Metrics for a single solve operation."""
+    """
+    Metrics for a single solve operation.
+    """
 
     # Basic metrics
     solve_time: float
@@ -51,15 +53,15 @@ class SolveMetrics:
     preprocessing_time: float = 0.0
 
     # Result metrics
-    ratio_found: Optional[float] = None
+    ratio_found: float | None = None
     cycle_length: int = 0
 
     # Resource usage
-    memory_peak: Optional[int] = None
-    cpu_time: Optional[float] = None
+    memory_peak: int | None = None
+    cpu_time: float | None = None
 
     # Error information
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     # Metadata
     timestamp: float = field(default_factory=time.time)
@@ -71,8 +73,8 @@ class SolverMetrics:
     Comprehensive metrics collection for solver performance analysis.
 
     This class collects and analyzes performance metrics across multiple
-    solver runs, providing insights into performance patterns, bottlenecks,
-    and optimization opportunities.
+    solver runs, providing insights into performance patterns,
+    bottlenecks, and optimization opportunities.
     """
 
     def __init__(self, max_history: int = 1000):
@@ -87,7 +89,7 @@ class SolverMetrics:
         self._lock = threading.Lock()
 
         # Aggregated statistics
-        self._stats_cache: Dict[str, Any] = {}
+        self._stats_cache: dict[str, Any] = {}
         self._cache_valid = False
 
     def record_solve(
@@ -98,10 +100,10 @@ class SolverMetrics:
         mode: str,
         iterations: int = 0,
         preprocessing_time: float = 0.0,
-        ratio_found: Optional[float] = None,
+        ratio_found: float | None = None,
         cycle_length: int = 0,
-        memory_peak: Optional[int] = None,
-        error_message: Optional[str] = None,
+        memory_peak: int | None = None,
+        error_message: str | None = None,
     ) -> None:
         """
         Record metrics from a solve operation.
@@ -155,7 +157,7 @@ class SolverMetrics:
             self._solve_records.append(record)
             self._cache_valid = False  # Invalidate statistics cache
 
-    def get_summary_stats(self) -> Dict[str, Any]:
+    def get_summary_stats(self) -> dict[str, Any]:
         """
         Get summary statistics across all recorded solves.
 
@@ -192,11 +194,13 @@ class SolverMetrics:
 
     def _calculate_basic_stats(
         self,
-        records: List[SolveMetrics],
-        successful: List[SolveMetrics],
-        failed: List[SolveMetrics],
-    ) -> Dict[str, Any]:
-        """Calculate basic statistics without numpy dependency."""
+        records: list[SolveMetrics],
+        successful: list[SolveMetrics],
+        failed: list[SolveMetrics],
+    ) -> dict[str, Any]:
+        """
+        Calculate basic statistics without numpy dependency.
+        """
         total_records = len(records)
 
         if not records:
@@ -247,11 +251,13 @@ class SolverMetrics:
 
     def _calculate_advanced_stats(
         self,
-        records: List[SolveMetrics],
-        successful: List[SolveMetrics],
-        failed: List[SolveMetrics],
-    ) -> Dict[str, Any]:
-        """Calculate advanced statistics with numpy."""
+        records: list[SolveMetrics],
+        successful: list[SolveMetrics],
+        failed: list[SolveMetrics],
+    ) -> dict[str, Any]:
+        """
+        Calculate advanced statistics with numpy.
+        """
         import numpy as np
 
         total_records = len(records)
@@ -375,7 +381,7 @@ class SolverMetrics:
             "last_updated": time.time(),
         }
 
-    def get_performance_trends(self, window_size: int = 100) -> Dict[str, List[float]]:
+    def get_performance_trends(self, window_size: int = 100) -> dict[str, list[float]]:
         """
         Get performance trends over time using moving averages.
 
@@ -425,7 +431,7 @@ class SolverMetrics:
 
         return trends
 
-    def export_to_json(self, filepath: Union[str, Path]) -> None:
+    def export_to_json(self, filepath: str | Path) -> None:
         """
         Export all metrics to JSON file.
 
@@ -470,7 +476,7 @@ class SolverMetrics:
         with open(filepath, "w") as f:
             json.dump(export_data, f, indent=2, sort_keys=True)
 
-    def import_from_json(self, filepath: Union[str, Path]) -> None:
+    def import_from_json(self, filepath: str | Path) -> None:
         """
         Import metrics from JSON file.
 
@@ -482,7 +488,7 @@ class SolverMetrics:
         if not filepath.exists():
             raise FileNotFoundError(f"Metrics file not found: {filepath}")
 
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             data = json.load(f)
 
         with self._lock:
@@ -510,17 +516,21 @@ class SolverMetrics:
             self._cache_valid = False  # Invalidate cache
 
     def clear_history(self) -> None:
-        """Clear all recorded metrics."""
+        """
+        Clear all recorded metrics.
+        """
         with self._lock:
             self._solve_records.clear()
             self._stats_cache.clear()
             self._cache_valid = False
 
     def get_record_count(self) -> int:
-        """Get the number of recorded solve operations."""
+        """
+        Get the number of recorded solve operations.
+        """
         return len(self._solve_records)
 
-    def get_recent_records(self, n: int = 10) -> List[SolveMetrics]:
+    def get_recent_records(self, n: int = 10) -> list[SolveMetrics]:
         """
         Get the n most recent solve records.
 
@@ -560,19 +570,27 @@ class MetricsCollector:
 
     @classmethod
     def get_instance(cls) -> "MetricsCollector":
-        """Get the global metrics collector instance."""
+        """
+        Get the global metrics collector instance.
+        """
         return cls()
 
     def record(self, *args, **kwargs) -> None:
-        """Record a solve operation (delegates to SolverMetrics.record_solve)."""
+        """
+        Record a solve operation (delegates to SolverMetrics.record_solve).
+        """
         self.metrics.record_solve(*args, **kwargs)
 
-    def get_stats(self) -> Dict[str, Any]:
-        """Get summary statistics (delegates to SolverMetrics.get_summary_stats)."""
+    def get_stats(self) -> dict[str, Any]:
+        """
+        Get summary statistics (delegates to SolverMetrics.get_summary_stats).
+        """
         return self.metrics.get_summary_stats()
 
-    def export(self, filepath: Union[str, Path]) -> None:
-        """Export metrics to file (delegates to SolverMetrics.export_to_json)."""
+    def export(self, filepath: str | Path) -> None:
+        """
+        Export metrics to file (delegates to SolverMetrics.export_to_json).
+        """
         self.metrics.export_to_json(filepath)
 
 
@@ -592,9 +610,10 @@ class PerformanceAnalyzer:
         recent_window: int = 50,
         baseline_window: int = 100,
         threshold: float = 1.2,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
-        Detect performance regressions by comparing recent vs baseline performance.
+        Detect performance regressions by comparing recent vs baseline
+        performance.
 
         Args:
             recent_window: Size of recent performance window
@@ -643,18 +662,20 @@ class PerformanceAnalyzer:
             "success_regression_detected": success_regression,
             "baseline_avg_time": baseline_avg_time,
             "recent_avg_time": recent_avg_time,
-            "time_degradation_factor": recent_avg_time / baseline_avg_time
-            if baseline_avg_time > 0
-            else 0,
+            "time_degradation_factor": (
+                recent_avg_time / baseline_avg_time if baseline_avg_time > 0 else 0
+            ),
             "baseline_success_rate": baseline_success_rate,
             "recent_success_rate": recent_success_rate,
-            "success_degradation_factor": recent_success_rate / baseline_success_rate
-            if baseline_success_rate > 0
-            else 0,
+            "success_degradation_factor": (
+                recent_success_rate / baseline_success_rate
+                if baseline_success_rate > 0
+                else 0
+            ),
             "analysis_timestamp": time.time(),
         }
 
-    def compare_modes(self) -> Dict[str, Any]:
+    def compare_modes(self) -> dict[str, Any]:
         """
         Compare performance across different solver modes.
 
@@ -681,18 +702,18 @@ class PerformanceAnalyzer:
             "fastest_mode": modes_by_time[0][0] if modes_by_time else None,
             "slowest_mode": modes_by_time[-1][0] if modes_by_time else None,
             "most_reliable_mode": modes_by_success[0][0] if modes_by_success else None,
-            "least_reliable_mode": modes_by_success[-1][0]
-            if modes_by_success
-            else None,
+            "least_reliable_mode": (
+                modes_by_success[-1][0] if modes_by_success else None
+            ),
             "mode_performance": mode_performance,
             "speed_improvement_factor": (
-                modes_by_time[-1][1]["avg_time"] / modes_by_time[0][1]["avg_time"]
-            )
-            if len(modes_by_time) >= 2
-            else 1.0,
+                (modes_by_time[-1][1]["avg_time"] / modes_by_time[0][1]["avg_time"])
+                if len(modes_by_time) >= 2
+                else 1.0
+            ),
         }
 
-    def identify_bottlenecks(self) -> Dict[str, Any]:
+    def identify_bottlenecks(self) -> dict[str, Any]:
         """
         Identify performance bottlenecks based on recorded metrics.
 

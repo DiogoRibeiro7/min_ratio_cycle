@@ -1,22 +1,105 @@
+# Pre-commit hooks for min-ratio-cycle
+# Tip: keep hook versions aligned with your pyproject/dev-deps where applicable.
+# Install & run:
+#   poetry run pre-commit install
+#   poetry run pre-commit run --all-files
+
+ci:
+  autofix_prs: true
+  autoupdate_schedule: monthly
+
+minimum_pre_commit_version: "3.5.0"
+default_stages: [commit]
+
+default_language_version:
+  python: python3
+
+# Global excludes (applies to all hooks)
+exclude: |
+  (?x)(
+    ^docs/_build/|
+    ^build/|
+    ^dist/|
+    ^\.venv/|
+    ^\.mypy_cache/|
+    ^\.pytest_cache/|
+    ^\.ruff_cache/|
+    ^\.git/|
+    ^poetry\.lock$|
+    \.ipynb$
+  )
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
       - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-merge-conflict
+      - id: detect-private-key
       - id: check-added-large-files
+        args: ["--maxkb=500"]
+
   - repo: https://github.com/psf/black
-    rev: 23.9.1
+    # Pin to match your dev dependency (e.g., 24.3.0)
+    rev: 24.3.0
     hooks:
       - id: black
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+        args: ["--line-length=88"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        # Ruff handles lint + import sorting (I001); keep black for formatting
+        args: ["--fix"]
+        stages: [manual]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
     hooks:
       - id: isort
+        # If you rely on Ruff for import sorting, you can remove isort
+        args: ["--profile=black", "--line-length=88"]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.16.0
+    hooks:
+      - id: pyupgrade
+        args: ["--py310-plus"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        stages: [manual]
+        additional_dependencies:
+          - types-setuptools
+        args: ["--strict"]
+
+
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.5
+    hooks:
+      - id: docformatter
+        args: ["--in-place", "--pre-summary-newline", "--make-summary-multi-line"]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        args: ["-L", "datas,nin", "--skip", "poetry.lock,docs/_build,*.svg"]
+
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+    rev: 1.7.9
     hooks:
       - id: bandit
-        args: ["-ll"]
-        files: ^min_ratio_cycle/
+        name: bandit (lib only)
+        stages: [manual]
+        pass_filenames: false
+        args: ["-r", "min_ratio_cycle", "-x", "tests", "-ll", "-ii"]
+        additional_dependencies: ["bandit[toml]"]

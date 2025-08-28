@@ -1,5 +1,11 @@
 # min-ratio-cycle
 
+[![CI](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle/branch/main/graph/badge.svg)](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle)
+[![Docs](https://readthedocs.org/projects/min-ratio-cycle/badge/?version=latest)](https://min-ratio-cycle.readthedocs.io/en/latest/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+![Python](https://img.shields.io/badge/Python-3.10%20|%203.11%20|%203.12-3776AB?logo=python\&logoColor=white)
+
 An optimized Python library for finding the **minimum cost-to-time ratio cycle** in a directed graph.
 
 > Lawler-style parametric search with NumPy-accelerated negative‑cycle detection and an exact Stern–Brocot mode for integer weights.
@@ -12,10 +18,14 @@ An optimized Python library for finding the **minimum cost-to-time ratio cycle**
   - [Table of Contents](#table-of-contents)
   - [Highlights](#highlights)
   - [Installation](#installation)
+    - [From PyPI (after publishing)](#from-pypi-after-publishing)
+    - [From source (development)](#from-source-development)
   - [Quick Start](#quick-start)
   - [Analytics \& Visualization](#analytics--visualization)
   - [How It Works (Short)](#how-it-works-short)
+  - [Theory](#theory)
   - [Background \& References](#background--references)
+  - [How to cite](#how-to-cite)
   - [Benchmarks](#benchmarks)
   - [Documentation](#documentation)
   - [Testing \& Quality](#testing--quality)
@@ -23,6 +33,9 @@ An optimized Python library for finding the **minimum cost-to-time ratio cycle**
   - [Troubleshooting](#troubleshooting)
   - [License](#license)
   - [Maintainer](#maintainer)
+  - [API surface (stable)](#api-surface-stable)
+  - [Contributing](#contributing)
+  - [Code of Conduct](#code-of-conduct)
 
 ---
 
@@ -40,22 +53,20 @@ An optimized Python library for finding the **minimum cost-to-time ratio cycle**
 
 ## Installation
 
-This project uses Poetry.
+### From PyPI (after publishing)
+
+```bash
+pip install min-ratio-cycle
+```
+
+### From source (development)
 
 ```bash
 poetry install
-```
-
-Tips
-
-* Prefer a system BLAS (OpenBLAS/MKL) for faster NumPy.
-* Enable pre-commit hooks after install:
-
-```bash
 poetry run pre-commit install
 ```
 
----
+**Supported Python**: 3.10, 3.11, 3.12 (see `pyproject.toml`).
 
 ## Quick Start
 
@@ -123,9 +134,22 @@ This design offers practical speed (vectorized relaxations) and correctness (exa
 
 ---
 
+## Theory
+
+We implement the classic **Lawler reduction** by reweighting edges with
+$w_\lambda(e) = c(e) - \lambda\,t(e)$. A **negative-cycle oracle** on the
+reweighted graph $G_\lambda$ acts as the decision procedure: if a negative cycle
+exists, then $\lambda < \lambda^*$; if not, $\lambda \geq \lambda^*$.
+We search for \lambda^\* by **bisection** in floating-point mode and via
+**Stern–Brocot** in exact integer mode. Our implementation is **weakly polynomial**
+(depends on numeric magnitudes) and optimized for practical performance. The
+Bringmann–Hansen–Krinninger results are **strongly polynomial** under specific
+models/assumptions and use parallelizable oracles; this library prioritizes
+clarity and reproducibility over matching those asymptotics.
+
 ## Background & References
 
-This library is based on and follows the problem formulation from:
+This library follows the problem formulation in:
 
 > **Karl Bringmann, Thomas Dueholm Hansen, Sebastian Krinninger** (ICALP 2017; arXiv:1704.08122),
 > *Improved Algorithms for Computing the Cycle of Minimum Cost‑to‑Time Ratio in Directed Graphs.*
@@ -135,8 +159,9 @@ This library is based on and follows the problem formulation from:
 * Adopt the **parametric reduction**: reweight edges as $c - \lambda t$ and test for negative cycles.
 * Implement a practical **decision oracle** with NumPy‑accelerated relaxations.
 * Use **bisection** for $\lambda$ in floating mode and **Stern–Brocot** in exact integer mode.
+* For theoretical equivalence/stopping criteria, see **Lemma 2.2** and the **parametric search** summary (Section 2) in the paper.
 
-**BibTeX** (please cite if you use this library in research):
+**BibTeX (paper)**
 
 ```bibtex
 @article{bringmann2017improved,
@@ -148,7 +173,22 @@ This library is based on and follows the problem formulation from:
 }
 ```
 
----
+## How to cite
+
+If you use this software, please cite the package and the paper.
+
+* **Software**: see **[CITATION.cff](./CITATION.cff)** (GitHub renders multiple formats automatically).
+* **Paper**: Bringmann–Hansen–Krinninger (2017), BibTeX:
+
+```bibtex
+@article{bringmann2017improved,
+  title   = {Improved Algorithms for Computing the Cycle of Minimum Cost-to-Time Ratio in Directed Graphs},
+  author  = {Karl Bringmann and Thomas Dueholm Hansen and Sebastian Krinninger},
+  journal = {arXiv:1704.08122},
+  year    = {2017},
+  note    = {Accepted to ICALP 2017}
+}
+```
 
 ## Benchmarks
 
@@ -246,3 +286,61 @@ ESMAD – Instituto Politécnico do Porto
 Personal: [diogo.debastos.ribeiro@gmail.com](mailto:diogo.debastos.ribeiro@gmail.com)
 Professional: [dfr@esmad.ipp.pt](mailto:dfr@esmad.ipp.pt)
 ORCID: [https://orcid.org/0009-0001-2022-7072](https://orcid.org/0009-0001-2022-7072)
+
+---
+
+## API surface (stable)
+
+**Public modules**
+
+* `min_ratio_cycle.solver`
+
+  * `class MinRatioCycleSolver(n_nodes: int)`
+
+    * `add_edge(u: int, v: int, *, cost: float, time: float) -> None`
+    * `add_edges(edges: Iterable[Edge]) -> None`
+    * `solve(*, exact: bool = False, tol: float | None = None, max_iter: int | None = None, lambda_lower: float | None = None, lambda_upper: float | None = None, return_object: bool = False)` →
+
+      * if `return_object=False`: `(cycle: list[int], cost: float, time: float, ratio: float)`
+      * if `return_object=True`: a `Result` object with attributes `cycle`, `cost`, `time`, `ratio` and method `visualize_solution(show_cycle: bool = True)`
+  * `@dataclass Edge(u: int, v: int, cost: float, time: float)`
+
+* `min_ratio_cycle.analytics`
+
+  * `sensitivity_analysis(solver: MinRatioCycleSolver, perturb: dict) -> dict`
+  * `confidence_interval(samples: Iterable[float], alpha: float = 0.05) -> tuple[float, float]`
+
+**Common `solve()` kwargs**
+
+* `exact` *(bool)*: enable exact Stern–Brocot search for integer inputs. Default `False`.
+* `tol` *(float | None)*: numeric tolerance for the decision oracle (negative‑cycle checks). If `None`, a sensible default is used.
+* `max_iter` *(int | None)*: cap iterations/relaxations for the oracle (safety on large graphs).
+* `lambda_lower`, `lambda_upper` *(float | None)*: optional bracket for the search over `λ`.
+* `return_object` *(bool)*: return a rich result object with helpers.
+
+> The API above is considered **stable**; breaking changes will be versioned with SemVer and documented in the changelog.
+
+---
+
+## Contributing
+
+Please read **[CONTRIBUTING.md](./CONTRIBUTING.md)** for how to set up your environment, run tests, style/typing requirements, and our PR checklist. In short:
+
+```bash
+# 1) Setup
+poetry install
+poetry run pre-commit install
+
+# 2) Test & quality
+poetry run pytest --cov=min_ratio_cycle
+poetry run mypy min_ratio_cycle
+poetry run black . && poetry run isort .
+poetry run flake8 .
+poetry run bandit -r min_ratio_cycle
+```
+
+We use **Conventional Commits** (e.g., `feat:`, `fix:`, `docs:`). Please add tests for new features and keep docs building (`sphinx-build`).
+
+## Code of Conduct
+
+This project adheres to the **[Code of Conduct](./CODE_OF_CONDUCT.md)**. By participating, you agree to uphold it. Enforcement contact: `dfr@esmad.ipp.pt`.

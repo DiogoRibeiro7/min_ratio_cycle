@@ -1,31 +1,32 @@
 """
 Custom exception classes for min-ratio-cycle solver.
 
-This module defines a hierarchy of custom exceptions to provide
-clear error handling and debugging information for different
-types of failures in the solver.
+This module defines a hierarchy of custom exceptions to provide clear
+error handling and debugging information for different types of failures
+in the solver.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class SolverError(Exception):
     """
     Base exception class for all solver-related errors.
 
-    This is the parent class for all custom exceptions in the
-    min-ratio-cycle solver package.
+    This is the parent class for all custom exceptions in the min-ratio-
+    cycle solver package.
     """
 
     def __init__(
         self,
         message: str,
-        details: Optional[Dict[str, Any]] = None,
-        component: Optional[str] = None,
-        suggested_fix: Optional[str] = None,
-        recovery_hint: Optional[str] = None,
+        details: dict[str, Any] | None = None,
+        component: str | None = None,
+        suggested_fix: str | None = None,
+        recovery_hint: str | None = None,
     ):
-        """Initialize solver error with rich context.
+        """
+        Initialize solver error with rich context.
 
         Args:
             message: Human-readable error message.
@@ -45,14 +46,18 @@ class SolverError(Exception):
             self.details.setdefault("recovery_hint", recovery_hint)
 
     def __str__(self) -> str:
-        """String representation of the error."""
+        """
+        String representation of the error.
+        """
         if self.details:
             details_str = ", ".join(f"{k}={v}" for k, v in self.details.items())
             return f"{self.message} ({details_str})"
         return self.message
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert error to dictionary representation."""
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert error to dictionary representation.
+        """
         return {
             "error_type": self.__class__.__name__,
             "message": self.message,
@@ -64,16 +69,16 @@ class ValidationError(SolverError):
     """
     Exception raised for input validation failures.
 
-    This includes invalid graph parameters, edge weights,
-    vertex indices, and other input validation issues.
+    This includes invalid graph parameters, edge weights, vertex
+    indices, and other input validation issues.
     """
 
     def __init__(
         self,
         message: str,
         invalid_value: Any = None,
-        expected_type: Optional[type] = None,
-        valid_range: Optional[tuple] = None,
+        expected_type: type | None = None,
+        valid_range: tuple | None = None,
     ):
         """
         Initialize validation error.
@@ -110,8 +115,8 @@ class GraphError(SolverError):
     def __init__(
         self,
         message: str,
-        graph_properties: Optional[Dict[str, Any]] = None,
-        suggested_fix: Optional[str] = None,
+        graph_properties: dict[str, Any] | None = None,
+        suggested_fix: str | None = None,
     ):
         """
         Initialize graph error.
@@ -133,14 +138,16 @@ class GraphError(SolverError):
 
 
 class GraphStructureError(GraphError):
-    """Graph is structurally invalid for the requested operation."""
+    """
+    Graph is structurally invalid for the requested operation.
+    """
 
     def __init__(
         self,
         message: str,
-        graph_properties: Optional[Dict[str, Any]] = None,
-        suggested_fix: Optional[str] = None,
-        recovery_hint: Optional[str] = None,
+        graph_properties: dict[str, Any] | None = None,
+        suggested_fix: str | None = None,
+        recovery_hint: str | None = None,
     ):
         super().__init__(
             message,
@@ -155,16 +162,16 @@ class AlgorithmError(SolverError):
     """
     Exception raised for algorithm execution failures.
 
-    This includes convergence failures, numerical instability,
-    iteration limits exceeded, and other algorithmic issues.
+    This includes convergence failures, numerical instability, iteration
+    limits exceeded, and other algorithmic issues.
     """
 
     def __init__(
         self,
         message: str,
-        algorithm_name: Optional[str] = None,
-        iterations: Optional[int] = None,
-        convergence_info: Optional[Dict[str, float]] = None,
+        algorithm_name: str | None = None,
+        iterations: int | None = None,
+        convergence_info: dict[str, float] | None = None,
     ):
         """
         Initialize algorithm error.
@@ -200,9 +207,9 @@ class ConfigurationError(SolverError):
     def __init__(
         self,
         message: str,
-        config_section: Optional[str] = None,
-        invalid_parameters: Optional[List[str]] = None,
-        config_file: Optional[str] = None,
+        config_section: str | None = None,
+        invalid_parameters: list[str] | None = None,
+        config_file: str | None = None,
     ):
         """
         Initialize configuration error.
@@ -231,16 +238,16 @@ class MemoryError(SolverError):
     """
     Exception raised for memory-related issues.
 
-    This includes out-of-memory conditions, memory limit exceeded,
-    and other resource exhaustion problems.
+    This includes out-of-memory conditions, memory limit exceeded, and
+    other resource exhaustion problems.
     """
 
     def __init__(
         self,
         message: str,
-        memory_required: Optional[int] = None,
-        memory_available: Optional[int] = None,
-        memory_limit: Optional[int] = None,
+        memory_required: int | None = None,
+        memory_available: int | None = None,
+        memory_limit: int | None = None,
     ):
         """
         Initialize memory error.
@@ -266,16 +273,18 @@ class MemoryError(SolverError):
 
 
 class ResourceExhaustionError(SolverError):
-    """Raised when computation exceeds configured resource limits."""
+    """
+    Raised when computation exceeds configured resource limits.
+    """
 
     def __init__(
         self,
         message: str,
         resource: str,
-        limit: Optional[float] = None,
-        usage: Optional[float] = None,
-        suggested_fix: Optional[str] = None,
-        recovery_hint: Optional[str] = None,
+        limit: float | None = None,
+        usage: float | None = None,
+        suggested_fix: str | None = None,
+        recovery_hint: str | None = None,
     ):
         details = {"resource": resource}
         if limit is not None:
@@ -297,16 +306,16 @@ class TimeoutError(SolverError):
     """
     Exception raised when solver operations exceed time limits.
 
-    This includes solve timeout, preprocessing timeout, and other
-    time-related constraints.
+    This includes solve timeout, preprocessing timeout, and other time-
+    related constraints.
     """
 
     def __init__(
         self,
         message: str,
-        time_elapsed: Optional[float] = None,
-        time_limit: Optional[float] = None,
-        operation: Optional[str] = None,
+        time_elapsed: float | None = None,
+        time_limit: float | None = None,
+        operation: str | None = None,
     ):
         """
         Initialize timeout error.
@@ -342,11 +351,13 @@ class NumericalError(SolverError):
     def __init__(
         self,
         message: str,
-        computation_details: Optional[Dict[str, Any]] = None,
-        suggested_mode: Optional[str] = None,
+        computation_details: dict[str, Any] | None = None,
+        suggested_mode: str | None = None,
         **kwargs: Any,
     ):
-        """Initialize numerical error."""
+        """
+        Initialize numerical error.
+        """
         details = {}
         if computation_details:
             details.update(computation_details)
@@ -359,15 +370,17 @@ class NumericalError(SolverError):
 
 
 class NumericalInstabilityError(NumericalError):
-    """Raised when numerical computations become unstable."""
+    """
+    Raised when numerical computations become unstable.
+    """
 
     def __init__(
         self,
         message: str,
-        computation_details: Optional[Dict[str, Any]] = None,
-        component: Optional[str] = None,
-        suggested_fix: Optional[str] = None,
-        recovery_hint: Optional[str] = None,
+        computation_details: dict[str, Any] | None = None,
+        component: str | None = None,
+        suggested_fix: str | None = None,
+        recovery_hint: str | None = None,
     ):
         super().__init__(
             message,
@@ -385,8 +398,8 @@ class ConvergenceError(AlgorithmError):
     """
     Exception raised when algorithms fail to converge.
 
-    This is a specialized AlgorithmError for convergence-related failures
-    in iterative algorithms like binary search or Bellman-Ford.
+    This is a specialized AlgorithmError for convergence-related
+    failures in iterative algorithms like binary search or Bellman-Ford.
     """
 
     def __init__(
@@ -394,8 +407,8 @@ class ConvergenceError(AlgorithmError):
         message: str,
         algorithm_name: str,
         max_iterations: int,
-        tolerance: Optional[float] = None,
-        final_error: Optional[float] = None,
+        tolerance: float | None = None,
+        final_error: float | None = None,
     ):
         """
         Initialize convergence error.
@@ -428,15 +441,16 @@ class CycleValidationError(ValidationError):
     Exception raised when cycle validation fails.
 
     This includes invalid cycle structure, missing edges in cycles,
-    incorrect weight calculations, and other cycle-related validation issues.
+    incorrect weight calculations, and other cycle-related validation
+    issues.
     """
 
     def __init__(
         self,
         message: str,
-        cycle: Optional[List[int]] = None,
-        missing_edges: Optional[List[tuple]] = None,
-        weight_mismatch: Optional[Dict[str, float]] = None,
+        cycle: list[int] | None = None,
+        missing_edges: list[tuple] | None = None,
+        weight_mismatch: dict[str, float] | None = None,
     ):
         """
         Initialize cycle validation error.
@@ -465,15 +479,17 @@ class CycleValidationError(ValidationError):
 
 # Exception handling utilities
 class ErrorHandler:
-    """Utility class for consistent error handling and reporting."""
+    """
+    Utility class for consistent error handling and reporting.
+    """
 
     @staticmethod
     def handle_validation_error(
         invalid_value: Any,
         parameter_name: str,
-        expected_type: Optional[type] = None,
-        valid_range: Optional[tuple] = None,
-        custom_message: Optional[str] = None,
+        expected_type: type | None = None,
+        valid_range: tuple | None = None,
+        custom_message: str | None = None,
     ) -> None:
         """
         Raise a properly formatted validation error.
@@ -508,10 +524,10 @@ class ErrorHandler:
     @staticmethod
     def handle_graph_error(
         message: str,
-        n_vertices: Optional[int] = None,
-        n_edges: Optional[int] = None,
-        density: Optional[float] = None,
-        suggested_fix: Optional[str] = None,
+        n_vertices: int | None = None,
+        n_edges: int | None = None,
+        density: float | None = None,
+        suggested_fix: str | None = None,
     ) -> None:
         """
         Raise a properly formatted graph error.
@@ -544,9 +560,9 @@ class ErrorHandler:
     def handle_algorithm_error(
         message: str,
         algorithm_name: str,
-        iterations: Optional[int] = None,
-        tolerance: Optional[float] = None,
-        final_error: Optional[float] = None,
+        iterations: int | None = None,
+        tolerance: float | None = None,
+        final_error: float | None = None,
         is_convergence_error: bool = False,
     ) -> None:
         """

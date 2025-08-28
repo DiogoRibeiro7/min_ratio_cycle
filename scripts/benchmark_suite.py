@@ -13,7 +13,6 @@ import time
 import tracemalloc
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,7 +25,9 @@ from min_ratio_cycle.solver import MinRatioCycleSolver
 
 @dataclass
 class BenchmarkResult:
-    """Store results from a single benchmark run."""
+    """
+    Store results from a single benchmark run.
+    """
 
     n_vertices: int
     n_edges: int
@@ -37,15 +38,19 @@ class BenchmarkResult:
     cycle_length: int
     mode: str  # 'exact' or 'numeric'
     success: bool
-    error_msg: Optional[str] = None
+    error_msg: str | None = None
 
 
 class GraphGenerator:
-    """Generate various types of test graphs."""
+    """
+    Generate various types of test graphs.
+    """
 
     @staticmethod
     def random_graph(n: int, density: float, seed: int = None) -> MinRatioCycleSolver:
-        """Generate random graph with given density."""
+        """
+        Generate random graph with given density.
+        """
         if seed is not None:
             np.random.seed(seed)
 
@@ -63,9 +68,11 @@ class GraphGenerator:
 
     @staticmethod
     def complete_graph(
-        n: int, weight_range: Tuple[int, int] = (-5, 5)
+        n: int, weight_range: tuple[int, int] = (-5, 5)
     ) -> MinRatioCycleSolver:
-        """Generate complete graph with random weights."""
+        """
+        Generate complete graph with random weights.
+        """
         solver = MinRatioCycleSolver(n)
 
         for u in range(n):
@@ -79,7 +86,9 @@ class GraphGenerator:
 
     @staticmethod
     def cycle_graph(n: int) -> MinRatioCycleSolver:
-        """Generate simple cycle graph 0->1->...->n-1->0."""
+        """
+        Generate simple cycle graph 0->1->...->n-1->0.
+        """
         solver = MinRatioCycleSolver(n)
 
         for i in range(n):
@@ -92,7 +101,9 @@ class GraphGenerator:
 
     @staticmethod
     def grid_graph(rows: int, cols: int) -> MinRatioCycleSolver:
-        """Generate grid graph with random weights."""
+        """
+        Generate grid graph with random weights.
+        """
         n = rows * cols
         solver = MinRatioCycleSolver(n)
 
@@ -116,15 +127,19 @@ class GraphGenerator:
 
 
 class BenchmarkRunner:
-    """Run and collect benchmark results."""
+    """
+    Run and collect benchmark results.
+    """
 
     def __init__(self):
-        self.results: List[BenchmarkResult] = []
+        self.results: list[BenchmarkResult] = []
 
     def run_single_benchmark(
         self, solver: MinRatioCycleSolver, graph_type: str, **kwargs
     ) -> BenchmarkResult:
-        """Run a single benchmark and collect metrics."""
+        """
+        Run a single benchmark and collect metrics.
+        """
         # Count edges and vertices
         solver._build_numpy_arrays_once()
         n_vertices = solver.n
@@ -178,7 +193,9 @@ class BenchmarkRunner:
         return result
 
     def scaling_benchmark(self, max_vertices: int = 100, step: int = 10):
-        """Test how performance scales with graph size."""
+        """
+        Test how performance scales with graph size.
+        """
         print("Running scaling benchmark...")
 
         sizes = list(range(10, max_vertices + 1, step))
@@ -214,7 +231,9 @@ class BenchmarkRunner:
                     print(f"    {graph_type}: ERROR - {e}")
 
     def density_benchmark(self, n_vertices: int = 50):
-        """Test how edge density affects performance."""
+        """
+        Test how edge density affects performance.
+        """
         print(f"\nRunning density benchmark (n={n_vertices})...")
 
         densities = [0.05, 0.1, 0.2, 0.3, 0.5, 0.7]
@@ -234,7 +253,9 @@ class BenchmarkRunner:
                 print(f"    FAILED - {result.error_msg}")
 
     def mode_comparison_benchmark(self):
-        """Compare exact vs numeric modes."""
+        """
+        Compare exact vs numeric modes.
+        """
         print("\nRunning mode comparison benchmark...")
 
         sizes = [10, 20, 30, 40, 50]
@@ -283,7 +304,9 @@ class BenchmarkRunner:
                 print(f"    Exact: {exact_status}, Numeric: {numeric_status}")
 
     def topology_benchmark(self):
-        """Test different graph topologies."""
+        """
+        Test different graph topologies.
+        """
         print("\nRunning topology benchmark...")
 
         n = 30  # Fixed size for comparison
@@ -315,7 +338,9 @@ class BenchmarkRunner:
                 print(f"    ERROR - {e}")
 
     def generate_report(self, save_plots: bool = True):
-        """Generate comprehensive benchmark report."""
+        """
+        Generate comprehensive benchmark report.
+        """
         if not self.results:
             print("No benchmark results to report!")
             return
@@ -337,7 +362,7 @@ class BenchmarkRunner:
 
         # Performance statistics
         times = [r.solve_time for r in successful]
-        print(f"\nSolve times:")
+        print("\nSolve times:")
         print(f"  Mean: {np.mean(times):.4f}s")
         print(f"  Median: {np.median(times):.4f}s")
         print(f"  Min: {np.min(times):.4f}s")
@@ -346,7 +371,7 @@ class BenchmarkRunner:
 
         # Memory usage
         memories = [r.memory_peak for r in successful]
-        print(f"\nMemory usage:")
+        print("\nMemory usage:")
         print(f"  Mean: {np.mean(memories)/1024:.1f}KB")
         print(f"  Max: {np.max(memories)/1024:.1f}KB")
 
@@ -358,7 +383,7 @@ class BenchmarkRunner:
             exact_times = [r.solve_time for r in exact_results]
             numeric_times = [r.solve_time for r in numeric_results]
 
-            print(f"\nMode comparison:")
+            print("\nMode comparison:")
             print(
                 f"  Exact mode:   {len(exact_results)} runs, mean time: {np.mean(exact_times):.4f}s"
             )
@@ -371,7 +396,9 @@ class BenchmarkRunner:
             self._generate_plots()
 
     def _generate_plots(self):
-        """Generate performance visualization plots."""
+        """
+        Generate performance visualization plots.
+        """
         successful = [r for r in self.results if r.success]
         if len(successful) < 5:
             print("Not enough data points for meaningful plots")
@@ -428,13 +455,17 @@ class BenchmarkRunner:
 
 
 class StressTest:
-    """Stress testing for edge cases and robustness."""
+    """
+    Stress testing for edge cases and robustness.
+    """
 
     def __init__(self):
         self.failed_cases = []
 
     def test_large_weights(self):
-        """Test with very large integer weights."""
+        """
+        Test with very large integer weights.
+        """
         print("Testing large weights...")
 
         solver = MinRatioCycleSolver(5)
@@ -455,7 +486,9 @@ class StressTest:
             self.failed_cases.append(("large_weights", e))
 
     def test_precision_edge_cases(self):
-        """Test numerical precision edge cases."""
+        """
+        Test numerical precision edge cases.
+        """
         print("Testing precision edge cases...")
 
         # Very small differences
@@ -472,7 +505,9 @@ class StressTest:
             self.failed_cases.append(("precision", e))
 
     def test_pathological_graphs(self):
-        """Test graphs designed to stress the algorithm."""
+        """
+        Test graphs designed to stress the algorithm.
+        """
         print("Testing pathological graphs...")
 
         # Long chain with cycle at the end
@@ -498,7 +533,9 @@ class StressTest:
             self.failed_cases.append(("pathological", e))
 
     def run_all_stress_tests(self):
-        """Run all stress tests."""
+        """
+        Run all stress tests.
+        """
         print("Running stress tests...")
         self.test_large_weights()
         self.test_precision_edge_cases()
@@ -513,7 +550,9 @@ class StressTest:
 
 
 def main():
-    """Run the complete benchmark suite."""
+    """
+    Run the complete benchmark suite.
+    """
     print("Min Ratio Cycle Solver - Comprehensive Benchmark Suite")
     print("=" * 60)
 

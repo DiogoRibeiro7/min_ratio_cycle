@@ -1,4 +1,5 @@
-"""Validation helpers for graphs and cycles.
+"""
+Validation helpers for graphs and cycles.
 
 This module provides reusable validation utilities for the min ratio cycle
 solver.  The functions raise :class:`ValidationError` or
@@ -10,9 +11,10 @@ from __future__ import annotations
 
 import math
 import warnings
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from fractions import Fraction
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Union
 
 import networkx as nx
 
@@ -27,14 +29,17 @@ Weight = Union[int, float, Fraction]
 
 
 def _is_number(value: object) -> bool:
-    """Return ``True`` if ``value`` is an accepted numeric type."""
+    """
+    Return ``True`` if ``value`` is an accepted numeric type.
+    """
     return isinstance(value, (int, float, Fraction))
 
 
 def validate_graph(
-    n_vertices: int, edges: Iterable[Tuple[int, int, Weight, Weight]]
+    n_vertices: int, edges: Iterable[tuple[int, int, Weight, Weight]]
 ) -> None:
-    """Validate basic structural properties of a directed graph.
+    """
+    Validate basic structural properties of a directed graph.
 
     Parameters
     ----------
@@ -87,9 +92,10 @@ def validate_graph(
 
 def validate_cycle(
     cycle: Sequence[int],
-    edge_lookup: Dict[Tuple[int, int], Tuple[Weight, Weight]],
-) -> Tuple[float, float, float]:
-    """Validate that ``cycle`` is closed and edges exist in ``edge_lookup``.
+    edge_lookup: dict[tuple[int, int], tuple[Weight, Weight]],
+) -> tuple[float, float, float]:
+    """
+    Validate that ``cycle`` is closed and edges exist in ``edge_lookup``.
 
     The ``edge_lookup`` mapping should map ``(u, v)`` pairs to ``(cost, time)``
     weights.  On success the function returns the total cost, time, and ratio of
@@ -128,46 +134,50 @@ def validate_cycle(
 
 @dataclass
 class ValidationHelper:
-    """Namespace wrapper around graph and cycle validation functions."""
+    """
+    Namespace wrapper around graph and cycle validation functions.
+    """
 
     @staticmethod
     def validate_graph(
-        n_vertices: int, edges: Iterable[Tuple[int, int, Weight, Weight]]
+        n_vertices: int, edges: Iterable[tuple[int, int, Weight, Weight]]
     ) -> None:
         validate_graph(n_vertices, edges)
 
     @staticmethod
     def validate_cycle(
         cycle: Sequence[int],
-        edge_lookup: Dict[Tuple[int, int], Tuple[Weight, Weight]],
-    ) -> Tuple[float, float, float]:
+        edge_lookup: dict[tuple[int, int], tuple[Weight, Weight]],
+    ) -> tuple[float, float, float]:
         return validate_cycle(cycle, edge_lookup)
 
     @staticmethod
     def generate_graph_report(
-        n_vertices: int, edges: Iterable[Tuple[int, int, Weight, Weight]]
-    ) -> "ValidationReport":
+        n_vertices: int, edges: Iterable[tuple[int, int, Weight, Weight]]
+    ) -> ValidationReport:
         return generate_validation_report(n_vertices, edges)
 
 
 @dataclass
 class ValidationIssue:
     message: str
-    context: Optional[Dict[str, Any]] = None
+    context: dict[str, Any] | None = None
 
 
 @dataclass
 class ValidationReport:
     is_valid: bool
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
 
 
 def generate_validation_report(
-    n_vertices: int, edges: Iterable[Tuple[int, int, Weight, Weight]]
+    n_vertices: int, edges: Iterable[tuple[int, int, Weight, Weight]]
 ) -> ValidationReport:
-    """Return a detailed validation report instead of raising errors."""
+    """
+    Return a detailed validation report instead of raising errors.
+    """
 
-    issues: List[ValidationIssue] = []
+    issues: list[ValidationIssue] = []
 
     def add(message: str, **ctx: Any) -> None:
         issues.append(ValidationIssue(message, ctx or None))
@@ -199,7 +209,9 @@ def generate_validation_report(
 
 @dataclass
 class TopologyInfo:
-    """Simple graph topology summary."""
+    """
+    Simple graph topology summary.
+    """
 
     is_connected: bool
     is_dag: bool
@@ -207,9 +219,11 @@ class TopologyInfo:
 
 
 def analyze_graph_topology(
-    n_vertices: int, edges: Iterable[Tuple[int, int, Weight, Weight]]
+    n_vertices: int, edges: Iterable[tuple[int, int, Weight, Weight]]
 ) -> TopologyInfo:
-    """Return connectivity and acyclicity information for a graph."""
+    """
+    Return connectivity and acyclicity information for a graph.
+    """
 
     G = nx.DiGraph()
     G.add_nodes_from(range(n_vertices))
@@ -225,7 +239,9 @@ def analyze_graph_topology(
 
 
 def _condition_number(values: Sequence[float]) -> float:
-    """Return crude condition number ``max/ min`` for ``values``."""
+    """
+    Return crude condition number ``max/ min`` for ``values``.
+    """
 
     positive = [abs(v) for v in values if v != 0]
     if not positive:
@@ -237,12 +253,14 @@ def _condition_number(values: Sequence[float]) -> float:
 
 def pre_solve_validate(
     n_vertices: int,
-    edges: Iterable[Tuple[int, int, Weight, Weight]],
+    edges: Iterable[tuple[int, int, Weight, Weight]],
     *,
     weight_limit: float = 1e9,
     cond_threshold: float = 1e12,
 ) -> None:
-    """Run extended checks before attempting to solve the graph."""
+    """
+    Run extended checks before attempting to solve the graph.
+    """
 
     edge_list = list(edges)
     validate_graph(n_vertices, edge_list)
@@ -294,11 +312,13 @@ def pre_solve_validate(
 def post_solve_validate(
     cycle: Sequence[int],
     ratio: float,
-    edge_lookup: Dict[Tuple[int, int], Tuple[Weight, Weight]],
+    edge_lookup: dict[tuple[int, int], tuple[Weight, Weight]],
     *,
     tol: float = 1e-9,
-) -> Tuple[float, float, float]:
-    """Verify solved cycle and ratio consistency."""
+) -> tuple[float, float, float]:
+    """
+    Verify solved cycle and ratio consistency.
+    """
 
     cost, time, computed_ratio = validate_cycle(cycle, edge_lookup)
     if not math.isclose(computed_ratio, ratio, rel_tol=tol, abs_tol=tol):

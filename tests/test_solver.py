@@ -8,13 +8,11 @@ Features:
 - Correctness validation of returned cycles
 """
 
-import math
 import time
-from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
@@ -22,31 +20,41 @@ from min_ratio_cycle.exceptions import (
     NumericalInstabilityError,
     ResourceExhaustionError,
 )
-from min_ratio_cycle.solver import Edge, MinRatioCycleSolver, SolverConfig
+from min_ratio_cycle.solver import MinRatioCycleSolver, SolverConfig
 
 
 class TestEdgeCases:
-    """Test edge cases and degenerate scenarios."""
+    """
+    Test edge cases and degenerate scenarios.
+    """
 
     def test_empty_graph(self):
-        """Graph with no edges should raise appropriate error."""
+        """
+        Graph with no edges should raise appropriate error.
+        """
         solver = MinRatioCycleSolver(3)
         with pytest.raises(ValueError, match="Graph has no edges"):
             solver.solve()
 
     def test_single_vertex(self):
-        """Single vertex with no edges."""
+        """
+        Single vertex with no edges.
+        """
         solver = MinRatioCycleSolver(1)
         with pytest.raises(ValueError, match="Graph has no edges"):
             solver.solve()
 
     def test_zero_vertices_invalid(self):
-        """Zero vertices should be rejected at construction."""
+        """
+        Zero vertices should be rejected at construction.
+        """
         with pytest.raises(ValueError, match="n_vertices must be a positive integer"):
             MinRatioCycleSolver(0)
 
     def test_no_cycles_tree(self):
-        """Tree structure with no cycles should fail gracefully."""
+        """
+        Tree structure with no cycles should fail gracefully.
+        """
         solver = MinRatioCycleSolver(4)
         # Create a tree: 0->1, 1->2, 1->3
         solver.add_edge(0, 1, 5, 2)
@@ -59,7 +67,9 @@ class TestEdgeCases:
             solver.solve()
 
     def test_self_loop(self):
-        """Single vertex with self-loop."""
+        """
+        Single vertex with self-loop.
+        """
         solver = MinRatioCycleSolver(1)
         solver.add_edge(0, 0, 3, 2)
 
@@ -70,7 +80,9 @@ class TestEdgeCases:
         assert abs(ratio - 1.5) < 1e-10
 
     def test_parallel_edges(self):
-        """Multiple edges between same vertices."""
+        """
+        Multiple edges between same vertices.
+        """
         solver = MinRatioCycleSolver(2)
         # Add multiple 0->1 edges with different ratios
         solver.add_edge(0, 1, 10, 2)  # ratio 5
@@ -84,7 +96,9 @@ class TestEdgeCases:
         assert abs(ratio - 1.75) < 1e-10  # (6+1)/(3+1) = 1.75
 
     def test_disconnected_components(self):
-        """Graph with multiple disconnected components."""
+        """
+        Graph with multiple disconnected components.
+        """
         solver = MinRatioCycleSolver(6)
         # Component 1: cycle 0->1->2->0
         solver.add_edge(0, 1, 2, 1)
@@ -100,7 +114,9 @@ class TestEdgeCases:
         assert abs(ratio - 0.5) < 1e-10  # (1+1)/(2+2) = 0.5
 
     def test_zero_time_edge_rejected(self):
-        """Edges with zero or negative time should be rejected."""
+        """
+        Edges with zero or negative time should be rejected.
+        """
         solver = MinRatioCycleSolver(2)
 
         with pytest.raises(ValueError, match="time must be strictly positive"):
@@ -110,7 +126,9 @@ class TestEdgeCases:
             solver.add_edge(0, 1, 1, -1)
 
     def test_invalid_vertex_indices(self):
-        """Invalid vertex indices should be rejected."""
+        """
+        Invalid vertex indices should be rejected.
+        """
         solver = MinRatioCycleSolver(3)
 
         with pytest.raises(ValueError, match="valid vertex indices"):
@@ -120,7 +138,9 @@ class TestEdgeCases:
             solver.add_edge(0, 3, 1, 1)
 
     def test_large_weights(self):
-        """Test with very large integer weights."""
+        """
+        Test with very large integer weights.
+        """
         solver = MinRatioCycleSolver(3)
         large_val = 10**15
         solver.add_edge(0, 1, large_val, 1)
@@ -134,17 +154,21 @@ class TestEdgeCases:
 
 
 class TestCorrectnessValidation:
-    """Validate that returned cycles are actually correct."""
+    """
+    Validate that returned cycles are actually correct.
+    """
 
     def validate_cycle(
         self,
         solver: MinRatioCycleSolver,
-        cycle: List[int],
+        cycle: list[int],
         expected_cost: float,
         expected_time: float,
         expected_ratio: float,
     ):
-        """Helper to validate a cycle's properties."""
+        """
+        Helper to validate a cycle's properties.
+        """
         # Check cycle is closed
         assert cycle[0] == cycle[-1], "Cycle should be closed (first == last)"
 
@@ -201,7 +225,9 @@ class TestCorrectnessValidation:
         ), f"Ratio mismatch: expected {expected_ratio}, got {actual_ratio}"
 
     def test_simple_triangle_validation(self):
-        """Validate a simple triangle cycle."""
+        """
+        Validate a simple triangle cycle.
+        """
         solver = MinRatioCycleSolver(3)
         solver.add_edge(0, 1, 2, 1)  # ratio 2
         solver.add_edge(1, 2, 3, 2)  # ratio 1.5
@@ -211,7 +237,9 @@ class TestCorrectnessValidation:
         self.validate_cycle(solver, cycle, sum_cost, sum_time, ratio)
 
     def test_mixed_integer_float_validation(self):
-        """Validate with mixed integer/float weights."""
+        """
+        Validate with mixed integer/float weights.
+        """
         solver = MinRatioCycleSolver(3)
         solver.add_edge(0, 1, 2.5, 1.0)
         solver.add_edge(1, 2, 3, 2.0)
@@ -222,7 +250,9 @@ class TestCorrectnessValidation:
 
 
 class TestResultPackaging:
-    """Ensure solver results are easy to consume."""
+    """
+    Ensure solver results are easy to consume.
+    """
 
     def test_iter_unpack(self, simple_triangle):
         solver, _ = simple_triangle
@@ -257,7 +287,9 @@ class TestResultPackaging:
 
 @composite
 def random_graph(draw, max_vertices=10, max_edges=20, integer_weights=True):
-    """Generate random graphs for property-based testing."""
+    """
+    Generate random graphs for property-based testing.
+    """
     n = draw(st.integers(min_value=2, max_value=max_vertices))
     m = draw(
         st.integers(min_value=n, max_value=max_edges)
@@ -297,12 +329,16 @@ def random_graph(draw, max_vertices=10, max_edges=20, integer_weights=True):
 
 
 class TestPropertyBased:
-    """Property-based testing with hypothesis."""
+    """
+    Property-based testing with hypothesis.
+    """
 
     @given(random_graph(max_vertices=6, max_edges=15, integer_weights=True))
     @settings(max_examples=50, deadline=5000)
     def test_integer_mode_consistency(self, graph_data):
-        """Test that integer mode produces valid results."""
+        """
+        Test that integer mode produces valid results.
+        """
         solver, edges = graph_data
 
         try:
@@ -328,7 +364,9 @@ class TestPropertyBased:
     @given(random_graph(max_vertices=6, max_edges=15, integer_weights=False))
     @settings(max_examples=50, deadline=5000)
     def test_float_mode_consistency(self, graph_data):
-        """Test that float mode produces valid results."""
+        """
+        Test that float mode produces valid results.
+        """
         solver, edges = graph_data
 
         try:
@@ -346,7 +384,9 @@ class TestPropertyBased:
     @given(st.integers(min_value=2, max_value=8))
     @settings(max_examples=20)
     def test_complete_graph_properties(self, n):
-        """Test properties on complete graphs with random weights."""
+        """
+        Test properties on complete graphs with random weights.
+        """
         solver = MinRatioCycleSolver(n)
 
         # Add edges for complete graph with random weights
@@ -366,16 +406,18 @@ class TestPropertyBased:
 
 
 class NaiveSolver:
-    """Naive implementation for benchmarking."""
+    """
+    Naive implementation for benchmarking.
+    """
 
     def __init__(self, n: int):
         self.n = n
-        self.edges: List[Tuple[int, int, float, float]] = []
+        self.edges: list[tuple[int, int, float, float]] = []
 
     def add_edge(self, u: int, v: int, cost: float, time: float):
         self.edges.append((u, v, cost, time))
 
-    def solve(self) -> Tuple[List[int], float, float, float]:
+    def solve(self) -> tuple[list[int], float, float, float]:
         """Brute force: enumerate all simple cycles up to length n."""
         best_ratio = float("inf")
         best_cycle = None
@@ -386,7 +428,7 @@ class NaiveSolver:
         for u, v, c, t in self.edges:
             adj[u].append((v, c, t))
 
-        def dfs_cycles(path: List[int], visited: Set[int], cost: float, time: float):
+        def dfs_cycles(path: list[int], visited: set[int], cost: float, time: float):
             nonlocal best_ratio, best_cycle, best_cost, best_time
 
             if len(path) > self.n:  # Avoid infinite recursion
@@ -418,10 +460,14 @@ class NaiveSolver:
 
 
 class TestBenchmarks:
-    """Benchmark comparisons."""
+    """
+    Benchmark comparisons.
+    """
 
     def create_test_graph(self, n: int, density: float = 0.3) -> MinRatioCycleSolver:
-        """Create a test graph with given density."""
+        """
+        Create a test graph with given density.
+        """
         solver = MinRatioCycleSolver(n)
 
         # Add random edges
@@ -436,7 +482,9 @@ class TestBenchmarks:
         return solver
 
     def test_performance_vs_naive_small(self):
-        """Compare performance against naive implementation on small graphs."""
+        """
+        Compare performance against naive implementation on small graphs.
+        """
         for n in [3, 4, 5]:
             print(f"\nTesting n={n} vertices:")
 
@@ -461,7 +509,7 @@ class TestBenchmarks:
                 our_time = time.time() - start_time
                 print(f"  Our solver: {our_time:.6f}s, ratio={ratio1:.6f}")
             except:
-                print(f"  Our solver: failed")
+                print("  Our solver: failed")
                 continue
 
             # Test naive solver
@@ -481,10 +529,12 @@ class TestBenchmarks:
                 ), f"Ratio mismatch: {ratio1} vs {ratio2}"
 
             except:
-                print(f"  Naive solver: failed")
+                print("  Naive solver: failed")
 
     def test_scaling_performance(self):
-        """Test how performance scales with graph size."""
+        """
+        Test how performance scales with graph size.
+        """
         print("\nScaling performance test:")
 
         for n in [10, 20, 50, 100]:
@@ -499,7 +549,9 @@ class TestBenchmarks:
                 print(f"  n={n:3d}: failed ({e})")
 
     def test_density_impact(self):
-        """Test how edge density affects performance."""
+        """
+        Test how edge density affects performance.
+        """
         print("\nDensity impact test (n=20):")
 
         for density in [0.05, 0.1, 0.2, 0.5]:

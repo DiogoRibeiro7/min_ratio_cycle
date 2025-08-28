@@ -1,7 +1,6 @@
 import time
 
 import psutil
-import pytest
 
 from min_ratio_cycle.solver import MinRatioCycleSolver
 
@@ -15,13 +14,17 @@ def _build_cycle_graph(n: int) -> MinRatioCycleSolver:
 
 
 def test_solver_benchmark(large_graph, benchmark):
-    """Benchmark the solver on a moderately sized graph."""
+    """
+    Benchmark the solver on a moderately sized graph.
+    """
     benchmark(lambda: large_graph.solve())
     assert benchmark.stats["mean"] < 0.6
 
 
 def test_no_memory_leak():
-    """Solve many small graphs and ensure memory usage stays bounded."""
+    """
+    Solve many small graphs and ensure memory usage stays bounded.
+    """
     proc = psutil.Process()
     rss_before = proc.memory_info().rss
     for _ in range(50):
@@ -32,7 +35,9 @@ def test_no_memory_leak():
 
 
 def test_complexity_scaling():
-    """Empirically verify near-quadratic scaling with graph size."""
+    """
+    Empirically verify near-quadratic scaling with graph size.
+    """
 
     def time_solver(n):
         solver = _build_cycle_graph(n)

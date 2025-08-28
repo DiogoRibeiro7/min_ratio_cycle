@@ -1,4 +1,6 @@
-"""Tests for validation helpers."""
+"""
+Tests for validation helpers.
+"""
 
 import pytest
 

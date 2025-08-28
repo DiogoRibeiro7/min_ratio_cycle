@@ -4,7 +4,9 @@ from contextlib import contextmanager
 
 # Missing: Performance profiler integration
 class SolverProfiler:
-    """Performance profiling utilities."""
+    """
+    Performance profiling utilities.
+    """
 
     def __init__(self, enable_profiling=False):
         self.enable_profiling = enable_profiling
@@ -12,7 +14,9 @@ class SolverProfiler:
 
     @contextmanager
     def profile_operation(self, operation_name):
-        """Profile a specific operation."""
+        """
+        Profile a specific operation.
+        """
         if not self.enable_profiling:
             yield
             return
@@ -46,7 +50,9 @@ class SolverProfiler:
             self.profiles.append(profile_data)
 
     def get_profile_report(self):
-        """Get formatted profile report."""
+        """
+        Get formatted profile report.
+        """
         if not self.profiles:
             return "No profiling data collected"
 

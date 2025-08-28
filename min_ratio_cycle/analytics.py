@@ -1,17 +1,20 @@
-"""Statistical analysis utilities for solver results."""
+"""
+Statistical analysis utilities for solver results.
+"""
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from math import sqrt
-from typing import Iterable, Tuple
 
 import numpy as np
 
 
 def confidence_interval(
     values: Iterable[float], alpha: float = 0.05
-) -> Tuple[float, float]:
-    """Return a two-sided confidence interval for the sample mean.
+) -> tuple[float, float]:
+    """
+    Return a two-sided confidence interval for the sample mean.
 
     Parameters
     ----------
@@ -58,7 +61,8 @@ def confidence_interval(
 
 
 def convergence_rate(errors: Iterable[float]) -> float:
-    """Estimate the average ratio of successive errors.
+    """
+    Estimate the average ratio of successive errors.
 
     Parameters
     ----------
@@ -84,7 +88,8 @@ def convergence_rate(errors: Iterable[float]) -> float:
 
 
 def compare_solutions(values1: Iterable[float], values2: Iterable[float]) -> float:
-    """Return Welch's t statistic comparing two samples.
+    """
+    Return Welch's t statistic comparing two samples.
 
     Parameters
     ----------

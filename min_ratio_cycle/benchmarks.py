@@ -1,12 +1,14 @@
-"""Benchmark utilities and regression testing for the solver."""
+"""
+Benchmark utilities and regression testing for the solver.
+"""
 
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from statistics import mean
 from time import perf_counter
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import networkx as nx
 
@@ -15,7 +17,8 @@ from .solver import MinRatioCycleSolver
 
 
 def load_dimacs_graph(lines: Iterable[str]) -> MinRatioCycleSolver:
-    """Parse a directed graph from DIMACS ``.sp`` style lines.
+    """
+    Parse a directed graph from DIMACS ``.sp`` style lines.
 
     Parameters
     ----------
@@ -41,7 +44,7 @@ def load_dimacs_graph(lines: Iterable[str]) -> MinRatioCycleSolver:
     5
     """
     n_vertices = 0
-    edges: List[Tuple[int, int, float, float]] = []
+    edges: list[tuple[int, int, float, float]] = []
     for line in lines:
         if not line or line.startswith("c"):
             continue
@@ -64,7 +67,8 @@ def load_dimacs_graph(lines: Iterable[str]) -> MinRatioCycleSolver:
 
 
 def compare_with_networkx(solver: MinRatioCycleSolver) -> float:
-    """Compare solver's ratio against a brute-force enumeration.
+    """
+    Compare solver's ratio against a brute-force enumeration.
 
     Parameters
     ----------
@@ -106,8 +110,9 @@ def compare_with_networkx(solver: MinRatioCycleSolver) -> float:
 
 def benchmark_solver(
     solver: MinRatioCycleSolver, *, compare: bool = True
-) -> Dict[str, Optional[float]]:
-    """Run the solver and measure runtime and optional accuracy.
+) -> dict[str, float | None]:
+    """
+    Run the solver and measure runtime and optional accuracy.
 
     Parameters
     ----------
@@ -135,8 +140,9 @@ def benchmark_solver(
     return {"ratio": result.ratio, "time": elapsed, "diff": diff}
 
 
-def load_baseline(path: str | Path) -> Dict[str, object]:
-    """Load a JSON baseline mapping.
+def load_baseline(path: str | Path) -> dict[str, object]:
+    """
+    Load a JSON baseline mapping.
 
     Parameters
     ----------
@@ -158,8 +164,9 @@ def load_baseline(path: str | Path) -> Dict[str, object]:
         return json.load(fh)
 
 
-def save_baseline(path: str | Path, data: Dict[str, object]) -> None:
-    """Persist ``data`` as a JSON baseline.
+def save_baseline(path: str | Path, data: dict[str, object]) -> None:
+    """
+    Persist ``data`` as a JSON baseline.
 
     Parameters
     ----------
@@ -182,12 +189,13 @@ def save_baseline(path: str | Path, data: Dict[str, object]) -> None:
 def regression_check(
     times: Sequence[float],
     ratio: float,
-    baseline: Dict[str, object],
+    baseline: dict[str, object],
     *,
     ratio_tol: float = 1e-9,
     t_threshold: float = 2.0,
-) -> Dict[str, bool]:
-    """Compare new measurements against a stored baseline.
+) -> dict[str, bool]:
+    """
+    Compare new measurements against a stored baseline.
 
     Parameters
     ----------

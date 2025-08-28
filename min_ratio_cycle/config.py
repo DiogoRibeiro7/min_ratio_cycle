@@ -9,15 +9,16 @@ This module provides comprehensive configuration management including:
 """
 
 import json
-import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 
 class SolverMode(Enum):
-    """Solver mode enumeration."""
+    """
+    Solver mode enumeration.
+    """
 
     AUTO = "auto"  # Automatic selection based on weight types
     EXACT = "exact"  # Force exact rational arithmetic
@@ -26,7 +27,9 @@ class SolverMode(Enum):
 
 
 class LogLevel(Enum):
-    """Logging level enumeration."""
+    """
+    Logging level enumeration.
+    """
 
     NONE = 0
     ERROR = 1
@@ -51,14 +54,14 @@ class SolverConfig:
     numeric_cycle_slack: float = 1e-15
 
     # Exact mode parameters
-    exact_max_denominator: Optional[int] = None
-    exact_max_steps: Optional[int] = None
+    exact_max_denominator: int | None = None
+    exact_max_steps: int | None = None
 
     # Performance parameters
     sparse_threshold: float = 0.1  # Use sparse optimizations below this density
     enable_preprocessing: bool = True
     enable_early_termination: bool = True
-    max_solve_time: Optional[float] = None  # Maximum time in seconds
+    max_solve_time: float | None = None  # Maximum time in seconds
 
     # Validation parameters
     validate_cycles: bool = True
@@ -70,23 +73,25 @@ class SolverConfig:
     collect_metrics: bool = True
     enable_profiling: bool = False
     log_to_file: bool = False
-    log_file_path: Optional[str] = None
+    log_file_path: str | None = None
 
     # Advanced options
     use_kahan_summation: bool = True  # For numerical stability
     parallel_threshold: int = 1000  # Use parallel processing above this size
-    memory_limit_gb: Optional[float] = None  # Memory usage limit
+    memory_limit_gb: float | None = None  # Memory usage limit
 
     # Debugging options
     debug_mode: bool = False
     save_intermediate_results: bool = False
-    intermediate_results_dir: Optional[str] = None
+    intermediate_results_dir: str | None = None
 
     # Default configuration dictionary for file-based config
-    _default_dict: Dict[str, Any] = field(default_factory=lambda: {})
+    _default_dict: dict[str, Any] = field(default_factory=lambda: {})
 
     def __post_init__(self):
-        """Initialize default configuration dictionary."""
+        """
+        Initialize default configuration dictionary.
+        """
         self._default_dict = {
             "numeric_mode": {
                 "max_iter": self.numeric_max_iter,
@@ -112,9 +117,11 @@ class SolverConfig:
                 "strict_validation": self.strict_validation,
             },
             "monitoring": {
-                "log_level": self.log_level.value
-                if isinstance(self.log_level, LogLevel)
-                else self.log_level,
+                "log_level": (
+                    self.log_level.value
+                    if isinstance(self.log_level, LogLevel)
+                    else self.log_level
+                ),
                 "collect_metrics": self.collect_metrics,
                 "enable_profiling": self.enable_profiling,
                 "log_to_file": self.log_to_file,
@@ -128,7 +135,7 @@ class SolverConfig:
         }
 
     @classmethod
-    def from_file(cls, config_path: Union[str, Path]) -> "SolverConfig":
+    def from_file(cls, config_path: str | Path) -> "SolverConfig":
         """
         Load configuration from JSON file.
 
@@ -148,7 +155,7 @@ class SolverConfig:
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
         try:
-            with open(config_path, "r") as f:
+            with open(config_path) as f:
                 config_dict = json.load(f)
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in configuration file: {e}")
@@ -156,7 +163,7 @@ class SolverConfig:
         return cls.from_dict(config_dict)
 
     @classmethod
-    def from_dict(cls, config_dict: Dict[str, Any]) -> "SolverConfig":
+    def from_dict(cls, config_dict: dict[str, Any]) -> "SolverConfig":
         """
         Create configuration from dictionary.
 
@@ -171,7 +178,9 @@ class SolverConfig:
 
         # Update with provided values
         def update_from_nested_dict(obj, nested_dict):
-            """Update object attributes from nested dictionary."""
+            """
+            Update object attributes from nested dictionary.
+            """
             for section, values in nested_dict.items():
                 if isinstance(values, dict):
                     for key, value in values.items():
@@ -194,7 +203,7 @@ class SolverConfig:
         update_from_nested_dict(instance, config_dict)
         return instance
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert configuration to dictionary format.
 
@@ -204,7 +213,7 @@ class SolverConfig:
         self.__post_init__()  # Ensure _default_dict is updated
         return self._default_dict.copy()
 
-    def save_to_file(self, config_path: Union[str, Path]) -> None:
+    def save_to_file(self, config_path: str | Path) -> None:
         """
         Save configuration to JSON file.
 
@@ -219,8 +228,10 @@ class SolverConfig:
         with open(config_path, "w") as f:
             json.dump(config_dict, f, indent=2, sort_keys=True)
 
-    def get_logging_config(self) -> Dict[str, Any]:
-        """Get logging-specific configuration."""
+    def get_logging_config(self) -> dict[str, Any]:
+        """
+        Get logging-specific configuration.
+        """
         return {
             "level": self.log_level,
             "log_to_file": self.log_to_file,
@@ -228,8 +239,10 @@ class SolverConfig:
             "debug_mode": self.debug_mode,
         }
 
-    def get_performance_config(self) -> Dict[str, Any]:
-        """Get performance-specific configuration."""
+    def get_performance_config(self) -> dict[str, Any]:
+        """
+        Get performance-specific configuration.
+        """
         return {
             "sparse_threshold": self.sparse_threshold,
             "enable_preprocessing": self.enable_preprocessing,
@@ -240,8 +253,10 @@ class SolverConfig:
             "memory_limit_gb": self.memory_limit_gb,
         }
 
-    def get_validation_config(self) -> Dict[str, Any]:
-        """Get validation-specific configuration."""
+    def get_validation_config(self) -> dict[str, Any]:
+        """
+        Get validation-specific configuration.
+        """
         return {
             "validate_cycles": self.validate_cycles,
             "repair_cycles": self.repair_cycles,
@@ -249,7 +264,9 @@ class SolverConfig:
         }
 
     def is_high_performance_mode(self) -> bool:
-        """Check if high-performance optimizations should be enabled."""
+        """
+        Check if high-performance optimizations should be enabled.
+        """
         return (
             not self.validate_cycles
             and not self.collect_metrics
@@ -292,11 +309,15 @@ class SolverConfig:
         return issues
 
     def __str__(self) -> str:
-        """String representation of configuration."""
+        """
+        String representation of configuration.
+        """
         return f"SolverConfig(mode=auto, logging={self.log_level.name}, validation={self.validate_cycles})"
 
     def __repr__(self) -> str:
-        """Detailed string representation."""
+        """
+        Detailed string representation.
+        """
         return (
             f"SolverConfig(numeric_max_iter={self.numeric_max_iter}, "
             f"log_level={self.log_level.name}, "
@@ -307,11 +328,15 @@ class SolverConfig:
 
 # Predefined configurations for common use cases
 class ConfigPresets:
-    """Predefined configuration presets for common scenarios."""
+    """
+    Predefined configuration presets for common scenarios.
+    """
 
     @staticmethod
     def fast_mode() -> SolverConfig:
-        """Configuration optimized for speed over accuracy."""
+        """
+        Configuration optimized for speed over accuracy.
+        """
         return SolverConfig(
             validate_cycles=False,
             repair_cycles=False,
@@ -325,7 +350,9 @@ class ConfigPresets:
 
     @staticmethod
     def accurate_mode() -> SolverConfig:
-        """Configuration optimized for accuracy over speed."""
+        """
+        Configuration optimized for accuracy over speed.
+        """
         return SolverConfig(
             validate_cycles=True,
             repair_cycles=True,
@@ -339,7 +366,9 @@ class ConfigPresets:
 
     @staticmethod
     def debug_mode() -> SolverConfig:
-        """Configuration for debugging and development."""
+        """
+        Configuration for debugging and development.
+        """
         return SolverConfig(
             debug_mode=True,
             log_level=LogLevel.DEBUG,
@@ -354,7 +383,9 @@ class ConfigPresets:
 
     @staticmethod
     def production_mode() -> SolverConfig:
-        """Configuration for production deployment."""
+        """
+        Configuration for production deployment.
+        """
         return SolverConfig(
             validate_cycles=True,
             repair_cycles=True,
@@ -368,7 +399,9 @@ class ConfigPresets:
 
     @staticmethod
     def research_mode() -> SolverConfig:
-        """Configuration for research and experimentation."""
+        """
+        Configuration for research and experimentation.
+        """
         return SolverConfig(
             collect_metrics=True,
             enable_profiling=True,

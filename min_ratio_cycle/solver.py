@@ -16,12 +16,10 @@ from __future__ import annotations
 import logging
 import math
 import time
-import warnings
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from fractions import Fraction
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -46,7 +44,9 @@ __author__ = "Enhanced by Claude"
 
 
 class SolverMode(Enum):
-    """Solver mode enumeration."""
+    """
+    Solver mode enumeration.
+    """
 
     AUTO = "auto"  # Automatic selection based on weight types
     EXACT = "exact"  # Force exact rational arithmetic
@@ -55,7 +55,9 @@ class SolverMode(Enum):
 
 
 class LogLevel(Enum):
-    """Logging level enumeration."""
+    """
+    Logging level enumeration.
+    """
 
     NONE = 0
     ERROR = 1
@@ -66,7 +68,9 @@ class LogLevel(Enum):
 
 @dataclass
 class SolverConfig:
-    """Configuration for the solver."""
+    """
+    Configuration for the solver.
+    """
 
     # Numeric mode parameters
     numeric_max_iter: int = 60
@@ -74,8 +78,8 @@ class SolverConfig:
     numeric_cycle_slack: float = 1e-15
 
     # Exact mode parameters
-    exact_max_denominator: Optional[int] = None
-    exact_max_steps: Optional[int] = None
+    exact_max_denominator: int | None = None
+    exact_max_steps: int | None = None
 
     # Performance parameters
     sparse_threshold: float = 0.1  # Use sparse optimizations below this density
@@ -92,8 +96,8 @@ class SolverConfig:
 
     # Advanced options
     use_kahan_summation: bool = True  # For numerical stability
-    max_solve_time: Optional[float] = None  # Maximum time in seconds
-    max_memory_mb: Optional[int] = None  # Maximum memory usage
+    max_solve_time: float | None = None  # Maximum time in seconds
+    max_memory_mb: int | None = None  # Maximum memory usage
 
 
 @dataclass(frozen=True)
@@ -101,17 +105,19 @@ class Edge:
     """
     Directed edge with cost and (strictly positive) transit time.
 
-    For exact solver, both cost and time should be integers or rational numbers.
-    For numeric solver, floats are acceptable.
+    For exact solver, both cost and time should be integers or rational
+    numbers. For numeric solver, floats are acceptable.
     """
 
     u: int
     v: int
-    cost: Union[float, int, Fraction]
-    time: Union[float, int, Fraction]
+    cost: float | int | Fraction
+    time: float | int | Fraction
 
     def __post_init__(self):
-        """Validate edge parameters."""
+        """
+        Validate edge parameters.
+        """
         if not isinstance(self.u, int) or not isinstance(self.v, int):
             raise ValueError("Vertex indices must be integers")
         if self.u < 0 or self.v < 0:
@@ -129,31 +135,37 @@ class Edge:
 
 @dataclass
 class SolverMetrics:
-    """Metrics collected during solving."""
+    """
+    Metrics collected during solving.
+    """
 
     solve_time: float = 0.0
     iterations: int = 0
     mode_used: str = ""
     preprocessing_time: float = 0.0
-    graph_properties: Dict[str, Any] = field(default_factory=dict)
-    memory_peak: Optional[int] = None
+    graph_properties: dict[str, Any] = field(default_factory=dict)
+    memory_peak: int | None = None
 
 
 @dataclass
 class SolverResult:
-    """Result from solver with additional metadata."""
+    """
+    Result from solver with additional metadata.
+    """
 
-    cycle: List[int]
-    sum_cost: Union[float, Fraction]
-    sum_time: Union[float, Fraction]
-    ratio: Union[float, Fraction]
+    cycle: list[int]
+    sum_cost: float | Fraction
+    sum_time: float | Fraction
+    ratio: float | Fraction
     success: bool = True
     error_message: str = ""
-    metrics: Optional[SolverMetrics] = None
-    config_used: Optional[SolverConfig] = None
+    metrics: SolverMetrics | None = None
+    config_used: SolverConfig | None = None
 
     def __iter__(self):
-        """Allow tuple unpacking of the primary result fields."""
+        """
+        Allow tuple unpacking of the primary result fields.
+        """
         yield self.cycle
         yield self.sum_cost
         yield self.sum_time
@@ -178,7 +190,7 @@ class MinRatioCycleSolver:
     - Debugging utilities
     """
 
-    def __init__(self, n_vertices: int, config: Optional[SolverConfig] = None):
+    def __init__(self, n_vertices: int, config: SolverConfig | None = None):
         """
         Initialize solver.
 
@@ -191,26 +203,26 @@ class MinRatioCycleSolver:
 
         self.n = n_vertices
         self.config = config or SolverConfig()
-        self._edges: List[Edge] = []
+        self._edges: list[Edge] = []
 
         # Setup logging
         self._setup_logging()
 
         # NumPy arrays (built lazily)
         self._arrays_built = False
-        self._U: Optional[np.ndarray] = None
-        self._V: Optional[np.ndarray] = None
-        self._C: Optional[np.ndarray] = None  # float64 costs
-        self._T: Optional[np.ndarray] = None  # float64 times
-        self._Ci: Optional[np.ndarray] = None  # int64 costs (exact mode)
-        self._Ti: Optional[np.ndarray] = None  # int64 times (exact mode)
-        self._starts: Optional[np.ndarray] = None  # CSR format
-        self._counts: Optional[np.ndarray] = None  # CSR format
+        self._U: np.ndarray | None = None
+        self._V: np.ndarray | None = None
+        self._C: np.ndarray | None = None  # float64 costs
+        self._T: np.ndarray | None = None  # float64 times
+        self._Ci: np.ndarray | None = None  # int64 costs (exact mode)
+        self._Ti: np.ndarray | None = None  # int64 times (exact mode)
+        self._starts: np.ndarray | None = None  # CSR format
+        self._counts: np.ndarray | None = None  # CSR format
 
         # State tracking
         self._all_int = True  # Whether all weights are integers
         self._is_sparse = False
-        self._last_result: Optional[SolverResult] = None
+        self._last_result: SolverResult | None = None
 
         # Metrics
         self._metrics = SolverMetrics() if self.config.collect_metrics else None
@@ -218,11 +230,15 @@ class MinRatioCycleSolver:
         self.logger.info(f"Initialized solver with {n_vertices} vertices")
 
     def _build_numpy_arrays_once(self) -> None:
-        """Backward compatibility shim for tests expecting this method."""
+        """
+        Backward compatibility shim for tests expecting this method.
+        """
         self._build_arrays_if_needed()
 
     def _setup_logging(self) -> None:
-        """Setup structured logging."""
+        """
+        Setup structured logging.
+        """
         self.logger = logging.getLogger(f"{__name__}.{id(self)}")
 
         if self.config.log_level == LogLevel.NONE:
@@ -252,8 +268,8 @@ class MinRatioCycleSolver:
         self,
         u: int,
         v: int,
-        cost: Union[float, int, Fraction],
-        time: Union[float, int, Fraction],
+        cost: float | int | Fraction,
+        time: float | int | Fraction,
     ) -> None:
         """
         Add a directed edge u -> v with given cost and time.
@@ -286,10 +302,10 @@ class MinRatioCycleSolver:
 
         self.logger.debug(f"Added edge {u} -> {v} (cost={cost}, time={time})")
 
-    def add_edges(
-        self, edges: List[Tuple[int, int, Union[float, int], Union[float, int]]]
-    ) -> None:
-        """Add multiple edges at once for efficiency."""
+    def add_edges(self, edges: list[tuple[int, int, float | int, float | int]]) -> None:
+        """
+        Add multiple edges at once for efficiency.
+        """
         for u, v, cost, time in edges:
             self.add_edge(u, v, cost, time)
 
@@ -309,7 +325,9 @@ class MinRatioCycleSolver:
         return False
 
     def clear_edges(self) -> None:
-        """Remove all edges from the graph."""
+        """
+        Remove all edges from the graph.
+        """
         self._edges.clear()
         self._arrays_built = False
         self.logger.debug("Cleared all edges")
@@ -318,8 +336,10 @@ class MinRatioCycleSolver:
     # Graph Analysis
     # ==============================
 
-    def get_graph_properties(self) -> Dict[str, Any]:
-        """Get comprehensive graph properties."""
+    def get_graph_properties(self) -> dict[str, Any]:
+        """
+        Get comprehensive graph properties.
+        """
         if not self._edges:
             return {"error": "No edges in graph"}
 
@@ -366,8 +386,10 @@ class MinRatioCycleSolver:
             },
         }
 
-    def detect_issues(self) -> List[Dict[str, str]]:
-        """Detect potential issues that might cause solve failures."""
+    def detect_issues(self) -> list[dict[str, str]]:
+        """
+        Detect potential issues that might cause solve failures.
+        """
         issues = []
         props = self.get_graph_properties()
 
@@ -426,7 +448,9 @@ class MinRatioCycleSolver:
     # ==============================
 
     def _build_arrays_if_needed(self) -> None:
-        """Build NumPy arrays if not already built."""
+        """
+        Build NumPy arrays if not already built.
+        """
         if self._arrays_built:
             return
 
@@ -487,7 +511,9 @@ class MinRatioCycleSolver:
         )
 
     def _preprocess_graph(self) -> None:
-        """Apply graph preprocessing optimizations."""
+        """
+        Apply graph preprocessing optimizations.
+        """
         if not self.config.enable_preprocessing:
             return
 
@@ -503,8 +529,10 @@ class MinRatioCycleSolver:
             self._arrays_built = False  # Need to rebuild arrays
 
     def _remove_dominated_edges(self) -> None:
-        """Remove edges dominated by others with same endpoints."""
-        edge_groups: Dict[Tuple[int, int], List[int]] = {}
+        """
+        Remove edges dominated by others with same endpoints.
+        """
+        edge_groups: dict[tuple[int, int], list[int]] = {}
 
         # Group edges by (u, v) pairs
         for i, edge in enumerate(self._edges):
@@ -552,8 +580,8 @@ class MinRatioCycleSolver:
 
     def solve(
         self,
-        mode: Union[SolverMode, str] = SolverMode.AUTO,
-        target_ratio: Optional[float] = None,
+        mode: SolverMode | str = SolverMode.AUTO,
+        target_ratio: float | None = None,
         **kwargs,
     ) -> SolverResult:
         """
@@ -655,7 +683,9 @@ class MinRatioCycleSolver:
     # ==============================
 
     def _solve_exact(self, **kwargs) -> SolverResult:
-        """Solve using exact rational arithmetic (Stern-Brocot search)."""
+        """
+        Solve using exact rational arithmetic (Stern-Brocot search).
+        """
         if not self._all_int:
             return SolverResult(
                 cycle=[],
@@ -702,9 +732,11 @@ class MinRatioCycleSolver:
             )
 
     def _stern_brocot_search(
-        self, max_den: Optional[int], max_steps: Optional[int]
-    ) -> Tuple[List[int], int, int, Tuple[int, int], float]:
-        """Implement Stern-Brocot tree search for exact optimal ratio."""
+        self, max_den: int | None, max_steps: int | None
+    ) -> tuple[list[int], int, int, tuple[int, int], float]:
+        """
+        Implement Stern-Brocot tree search for exact optimal ratio.
+        """
         if self._Ci is None or self._Ti is None:
             raise RuntimeError(
                 "Integer weight arrays (_Ci, _Ti) must be initialized before searching"
@@ -777,7 +809,9 @@ class MinRatioCycleSolver:
         return combo.astype(np.int64)
 
     def _has_negative_cycle_exact(self, a: int, b: int) -> bool:
-        """Check for negative cycle with exact integer arithmetic."""
+        """
+        Check for negative cycle with exact integer arithmetic.
+        """
         if self._U is None or self._V is None:
             raise RuntimeError(
                 "Edge endpoint arrays (_U, _V) must be initialized before cycle checks"
@@ -823,8 +857,10 @@ class MinRatioCycleSolver:
 
     def _find_zero_cycle_exact(
         self, a: int, b: int
-    ) -> Optional[Tuple[List[int], int, int]]:
-        """Find zero-weight cycle in equality subgraph."""
+    ) -> tuple[list[int], int, int] | None:
+        """
+        Find zero-weight cycle in equality subgraph.
+        """
         # First get potentials
         ok, dist = self._compute_potentials_exact(a, b)
         if not ok:
@@ -855,7 +891,7 @@ class MinRatioCycleSolver:
         color = np.zeros(self.n, dtype=np.int8)
         parent = np.full(self.n, -1, dtype=np.int64)
 
-        def dfs(u: int) -> Optional[List[int]]:
+        def dfs(u: int) -> list[int] | None:
             color[u] = 1  # Gray
             for v in adj[u]:
                 if color[v] == 0:  # White
@@ -883,8 +919,10 @@ class MinRatioCycleSolver:
 
         return None
 
-    def _compute_potentials_exact(self, a: int, b: int) -> Tuple[bool, np.ndarray]:
-        """Compute shortest path potentials with exact arithmetic."""
+    def _compute_potentials_exact(self, a: int, b: int) -> tuple[bool, np.ndarray]:
+        """
+        Compute shortest path potentials with exact arithmetic.
+        """
         if self._U is None or self._V is None:
             raise RuntimeError(
                 "Edge endpoint arrays (_U, _V) must be initialized before computing potentials"
@@ -931,9 +969,11 @@ class MinRatioCycleSolver:
         return True, dist
 
     def _compute_cycle_weights_exact(
-        self, cycle: List[int]
-    ) -> Tuple[List[int], int, int]:
-        """Compute exact cycle weights."""
+        self, cycle: list[int]
+    ) -> tuple[list[int], int, int]:
+        """
+        Compute exact cycle weights.
+        """
         sum_cost, sum_time = 0, 0
 
         for i in range(len(cycle)):
@@ -959,9 +999,11 @@ class MinRatioCycleSolver:
     # ==============================
 
     def _solve_numeric(
-        self, target_ratio: Optional[float] = None, **kwargs
+        self, target_ratio: float | None = None, **kwargs
     ) -> SolverResult:
-        """Solve using numeric binary search (Lawler's algorithm)."""
+        """
+        Solve using numeric binary search (Lawler's algorithm).
+        """
         lambda_lo = kwargs.get("lambda_lo")
         lambda_hi = kwargs.get("lambda_hi")
         max_iter = kwargs.get("max_iter", self.config.numeric_max_iter)
@@ -1081,8 +1123,10 @@ class MinRatioCycleSolver:
 
     def _detect_negative_cycle_numeric(
         self, lam: float, slack: float = 0.0
-    ) -> Tuple[bool, Optional[Tuple[List[int], float, float, float]]]:
-        """Detect negative cycle using vectorized Bellman-Ford."""
+    ) -> tuple[bool, tuple[list[int], float, float, float] | None]:
+        """
+        Detect negative cycle using vectorized Bellman-Ford.
+        """
         if self._U is None or self._V is None:
             raise RuntimeError(
                 "Edge endpoint arrays (_U, _V) must be initialized before numeric cycle detection"
@@ -1110,7 +1154,9 @@ class MinRatioCycleSolver:
         pred = np.full(n, -1, dtype=np.int64)
 
         def relax_once_kahan(update_pred: bool) -> bool:
-            """Relaxation step with Kahan summation for numerical stability."""
+            """
+            Relaxation step with Kahan summation for numerical stability.
+            """
             cand = dist[self._U] + W
             improve = cand < (dist[self._V] - slack)
 
@@ -1159,7 +1205,9 @@ class MinRatioCycleSolver:
             return True
 
         def relax_once_standard(update_pred: bool) -> bool:
-            """Standard relaxation step."""
+            """
+            Standard relaxation step.
+            """
             cand = dist[self._U] + W
             improve = cand < (dist[self._V] - slack)
 
@@ -1245,8 +1293,10 @@ class MinRatioCycleSolver:
         ratio = sum_cost / sum_time
         return True, (cycle, sum_cost, sum_time, ratio)
 
-    def _compute_cycle_weights_float(self, cycle: List[int]) -> Tuple[float, float]:
-        """Compute cycle weights using cached edge map."""
+    def _compute_cycle_weights_float(self, cycle: list[int]) -> tuple[float, float]:
+        """
+        Compute cycle weights using cached edge map.
+        """
         if not hasattr(self, "_edge_map") or self._edge_map is None:
             self._build_edge_map()
 
@@ -1277,7 +1327,9 @@ class MinRatioCycleSolver:
         return sum_cost, sum_time
 
     def _build_edge_map(self):
-        """Build edge lookup map for fast cycle weight computation."""
+        """
+        Build edge lookup map for fast cycle weight computation.
+        """
         self._edge_map = {}
         for edge in self._edges:
             key = (edge.u, edge.v)
@@ -1290,12 +1342,14 @@ class MinRatioCycleSolver:
 
     def _solve_approximate(
         self,
-        target_ratio: Optional[float] = None,
+        target_ratio: float | None = None,
         epsilon: float = 0.01,
-        max_time: Optional[float] = None,
+        max_time: float | None = None,
         **kwargs,
     ) -> SolverResult:
-        """Fast approximation algorithm for very large graphs."""
+        """
+        Fast approximation algorithm for very large graphs.
+        """
         max_time = max_time or self.config.max_solve_time or 60.0
         start_time = time.time()
 
@@ -1364,15 +1418,17 @@ class MinRatioCycleSolver:
 
     def _limited_search_from_vertex(
         self, start: int, max_depth: int
-    ) -> Tuple[Optional[List[int]], float]:
-        """Limited depth search for cycles from a starting vertex."""
+    ) -> tuple[list[int] | None, float]:
+        """
+        Limited depth search for cycles from a starting vertex.
+        """
         if not hasattr(self, "_adj_list") or self._adj_list is None:
             self._build_adjacency_list()
 
         best_cycle = None
         best_ratio = float("inf")
 
-        def dfs(path: List[int], visited: set, depth: int):
+        def dfs(path: list[int], visited: set, depth: int):
             nonlocal best_cycle, best_ratio
 
             if depth >= max_depth:
@@ -1414,15 +1470,19 @@ class MinRatioCycleSolver:
         return best_cycle, best_ratio
 
     def _build_adjacency_list(self):
-        """Build adjacency list representation."""
+        """
+        Build adjacency list representation.
+        """
         self._adj_list = [[] for _ in range(self.n)]
 
         for edge in self._edges:
             cost, time = float(edge.cost), float(edge.time)
             self._adj_list[edge.u].append((edge.v, cost, time))
 
-    def _get_edge_weights(self, u: int, v: int) -> Tuple[float, float]:
-        """Get edge weights between two vertices."""
+    def _get_edge_weights(self, u: int, v: int) -> tuple[float, float]:
+        """
+        Get edge weights between two vertices.
+        """
         for edge in self._edges:
             if edge.u == u and edge.v == v:
                 return float(edge.cost), float(edge.time)
@@ -1433,7 +1493,9 @@ class MinRatioCycleSolver:
     # ==============================
 
     def _validate_result(self, result: SolverResult) -> SolverResult:
-        """Validate and potentially repair the result."""
+        """
+        Validate and potentially repair the result.
+        """
         if not result.success or not result.cycle:
             return result
 
@@ -1498,8 +1560,10 @@ class MinRatioCycleSolver:
             result.error_message = f"Validation failed: {str(e)}"
             return result
 
-    def _verify_cycle_exists(self, cycle: List[int]) -> Tuple[bool, List[str]]:
-        """Verify all edges in cycle exist in graph."""
+    def _verify_cycle_exists(self, cycle: list[int]) -> tuple[bool, list[str]]:
+        """
+        Verify all edges in cycle exist in graph.
+        """
         issues = []
 
         for i in range(len(cycle) - 1):
@@ -1518,7 +1582,9 @@ class MinRatioCycleSolver:
         return len(issues) == 0, issues
 
     def _repair_short_cycle(self, result: SolverResult) -> SolverResult:
-        """Attempt to repair cycles that are too short."""
+        """
+        Attempt to repair cycles that are too short.
+        """
         # Simple repair: if cycle has only 2 vertices, look for a longer path
         if len(result.cycle) == 3 and result.cycle[0] == result.cycle[2]:
             # This is just u -> v -> u, try to find u -> w -> v -> u
@@ -1539,16 +1605,20 @@ class MinRatioCycleSolver:
         return result
 
     def _repair_missing_edges(
-        self, result: SolverResult, issues: List[str]
+        self, result: SolverResult, issues: list[str]
     ) -> SolverResult:
-        """Attempt to repair cycles with missing edges."""
+        """
+        Attempt to repair cycles with missing edges.
+        """
         # For now, just mark as failed - more sophisticated repair could be implemented
         result.success = False
         result.error_message = f"Could not repair cycle: {', '.join(issues)}"
         return result
 
     def _has_edge(self, u: int, v: int) -> bool:
-        """Check if edge u -> v exists."""
+        """
+        Check if edge u -> v exists.
+        """
         for edge in self._edges:
             if edge.u == u and edge.v == v:
                 return True
@@ -1559,7 +1629,9 @@ class MinRatioCycleSolver:
     # ==============================
 
     def get_debug_info(self) -> str:
-        """Get comprehensive debug information."""
+        """
+        Get comprehensive debug information.
+        """
         info = ["Min Ratio Cycle Solver - Debug Info"]
         info.append("=" * 50)
 
@@ -1606,7 +1678,7 @@ class MinRatioCycleSolver:
         # Last result
         if self._last_result:
             result = self._last_result
-            info.append(f"\nLast solve result:")
+            info.append("\nLast solve result:")
             info.append(f"  Success: {result.success}")
             if result.success:
                 info.append(f"  Ratio: {result.ratio}")
@@ -1625,9 +1697,10 @@ class MinRatioCycleSolver:
     # ==============================
 
     def sensitivity_analysis(
-        self, edge_perturbations: List[Dict[int, Tuple[float, float]]]
-    ) -> List[SolverResult]:
-        """Perform edge weight perturbation analysis.
+        self, edge_perturbations: list[dict[int, tuple[float, float]]]
+    ) -> list[SolverResult]:
+        """
+        Perform edge weight perturbation analysis.
 
         Args:
             edge_perturbations: List of scenarios, each mapping an edge index to
@@ -1639,7 +1712,7 @@ class MinRatioCycleSolver:
         """
 
         baseline = [Edge(e.u, e.v, e.cost, e.time) for e in self._edges]
-        results: List[SolverResult] = []
+        results: list[SolverResult] = []
         for scenario in edge_perturbations:
             for idx, (dc, dt) in scenario.items():
                 if idx < 0 or idx >= len(self._edges):
@@ -1655,8 +1728,9 @@ class MinRatioCycleSolver:
 
         return results
 
-    def stability_region(self, epsilon: float = 0.01) -> Dict[int, bool]:
-        """Estimate stability of the optimal cycle under small perturbations.
+    def stability_region(self, epsilon: float = 0.01) -> dict[int, bool]:
+        """
+        Estimate stability of the optimal cycle under small perturbations.
 
         Each edge is perturbed by ``epsilon`` fraction of its cost and time and
         the solver is executed again. If the optimal cycle remains unchanged the
@@ -1675,7 +1749,7 @@ class MinRatioCycleSolver:
             baseline_res = self._last_result
 
         baseline_cycle = baseline_res.cycle
-        stability: Dict[int, bool] = {}
+        stability: dict[int, bool] = {}
         for idx, e in enumerate(self._edges):
             dc = float(e.cost) * epsilon
             dt = float(e.time) * epsilon
@@ -1686,8 +1760,9 @@ class MinRatioCycleSolver:
 
     def visualize_solution(
         self, show_cycle: bool = True, layout: str = "spring"
-    ) -> Tuple[plt.Figure, plt.Axes]:
-        """Visualize the current graph and optionally highlight the solution.
+    ) -> tuple[plt.Figure, plt.Axes]:
+        """
+        Visualize the current graph and optionally highlight the solution.
 
         Args:
             show_cycle: If ``True`` highlight the most recent solution cycle.
@@ -1722,7 +1797,9 @@ class MinRatioCycleSolver:
         return fig, ax
 
     def create_interactive_plot(self) -> plt.Figure:
-        """Create an interactive matplotlib plot of the current graph."""
+        """
+        Create an interactive matplotlib plot of the current graph.
+        """
 
         fig, ax = self.visualize_solution()
 
@@ -1734,8 +1811,10 @@ class MinRatioCycleSolver:
         fig.canvas.mpl_connect("button_press_event", _on_click)
         return fig
 
-    def health_check(self) -> Dict[str, Any]:
-        """Run comprehensive health check."""
+    def health_check(self) -> dict[str, Any]:
+        """
+        Run comprehensive health check.
+        """
         checks = []
 
         # Check NumPy version
@@ -1815,9 +1894,9 @@ class MinRatioCycleSolver:
                     "name": "memory",
                     "status": "PASS" if available_gb >= min_memory else "WARN",
                     "details": f"{available_gb:.1f}GB available",
-                    "recommendation": "Consider freeing memory"
-                    if available_gb < min_memory
-                    else None,
+                    "recommendation": (
+                        "Consider freeing memory" if available_gb < min_memory else None
+                    ),
                 }
             )
         except ImportError:
@@ -1844,9 +1923,9 @@ class MinRatioCycleSolver:
                 "passed": passed,
                 "warnings": warnings,
                 "failures": failures,
-                "overall_status": "FAIL"
-                if failures > 0
-                else ("WARN" if warnings > 0 else "PASS"),
+                "overall_status": (
+                    "FAIL" if failures > 0 else ("WARN" if warnings > 0 else "PASS")
+                ),
             },
         }
 
@@ -1860,10 +1939,10 @@ class MinRatioCycleSolver:
 
 
 def solve_min_ratio_cycle(
-    edges: List[Tuple[int, int, Union[float, int], Union[float, int]]],
-    n_vertices: Optional[int] = None,
-    mode: Union[SolverMode, str] = SolverMode.AUTO,
-    config: Optional[SolverConfig] = None,
+    edges: list[tuple[int, int, float | int, float | int]],
+    n_vertices: int | None = None,
+    mode: SolverMode | str = SolverMode.AUTO,
+    config: SolverConfig | None = None,
 ) -> SolverResult:
     """
     Convenience function to solve min ratio cycle problem.

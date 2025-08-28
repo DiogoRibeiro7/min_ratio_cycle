@@ -1,4 +1,6 @@
-"""Regression tests to track performance, quality, and API stability."""
+"""
+Regression tests to track performance, quality, and API stability.
+"""
 
 from pathlib import Path
 

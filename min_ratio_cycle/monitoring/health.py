@@ -5,13 +5,17 @@ import time
 
 # Missing: Health check and diagnostics
 class SolverHealthCheck:
-    """System health checks and diagnostics."""
+    """
+    System health checks and diagnostics.
+    """
 
     def __init__(self):
         self.checks = []
 
     def check_numpy_version(self):
-        """Check NumPy version compatibility."""
+        """
+        Check NumPy version compatibility.
+        """
         import numpy as np
 
         min_version = "1.20.0"
@@ -33,7 +37,9 @@ class SolverHealthCheck:
         }
 
     def check_memory_available(self, min_memory_gb=1.0):
-        """Check available system memory."""
+        """
+        Check available system memory.
+        """
         try:
             import psutil
 
@@ -44,9 +50,11 @@ class SolverHealthCheck:
                 "check": "memory_available",
                 "status": "PASS" if is_sufficient else "WARN",
                 "details": f"{available_gb:.1f}GB available (min: {min_memory_gb}GB)",
-                "recommendation": "Consider smaller graphs or more memory"
-                if not is_sufficient
-                else None,
+                "recommendation": (
+                    "Consider smaller graphs or more memory"
+                    if not is_sufficient
+                    else None
+                ),
             }
         except ImportError:
             return {
@@ -57,8 +65,9 @@ class SolverHealthCheck:
             }
 
     def check_numerical_precision(self):
-        """Check floating-point precision issues."""
-        import numpy as np
+        """
+        Check floating-point precision issues.
+        """
 
         # Test for common precision issues
         test_cases = [
@@ -74,14 +83,18 @@ class SolverHealthCheck:
         return {
             "check": "numerical_precision",
             "status": "WARN" if issues else "PASS",
-            "details": f"Found {len(issues)} precision issues"
-            if issues
-            else "No precision issues detected",
+            "details": (
+                f"Found {len(issues)} precision issues"
+                if issues
+                else "No precision issues detected"
+            ),
             "recommendation": "Use exact mode when possible" if issues else None,
         }
 
     def run_all_checks(self):
-        """Run all health checks."""
+        """
+        Run all health checks.
+        """
         checks = [
             self.check_numpy_version(),
             self.check_memory_available(),
@@ -102,7 +115,9 @@ class SolverHealthCheck:
 
 # Missing: Configuration management
 class SolverConfig:
-    """Configuration management for solver parameters."""
+    """
+    Configuration management for solver parameters.
+    """
 
     DEFAULT_CONFIG = {
         "numeric_mode": {
@@ -135,9 +150,11 @@ class SolverConfig:
             self._update_config(config_dict)
 
     def load_from_file(self, filename):
-        """Load configuration from JSON file."""
+        """
+        Load configuration from JSON file.
+        """
         try:
-            with open(filename, "r") as f:
+            with open(filename) as f:
                 file_config = json.load(f)
                 self._update_config(file_config)
         except FileNotFoundError:
@@ -146,7 +163,9 @@ class SolverConfig:
             logging.error(f"Invalid JSON in config file: {e}")
 
     def _update_config(self, new_config):
-        """Recursively update configuration."""
+        """
+        Recursively update configuration.
+        """
 
         def deep_update(base, update):
             for key, value in update.items():
@@ -162,7 +181,9 @@ class SolverConfig:
         deep_update(self.config, new_config)
 
     def get(self, path, default=None):
-        """Get configuration value using dot notation."""
+        """
+        Get configuration value using dot notation.
+        """
         keys = path.split(".")
         value = self.config
 
@@ -174,6 +195,8 @@ class SolverConfig:
             return default
 
     def save_to_file(self, filename):
-        """Save current configuration to file."""
+        """
+        Save current configuration to file.
+        """
         with open(filename, "w") as f:
             json.dump(self.config, f, indent=2)
