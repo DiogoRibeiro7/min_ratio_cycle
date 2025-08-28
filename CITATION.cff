@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata below.
+title: min-ratio-cycle
+abstract: >-
+  Minimum cost-to-time ratio cycle solver with NumPy acceleration and exact
+  Stern–Brocot search for integer inputs.
+version: 0.1.0
+license: MIT
+type: software
+authors:
+  - family-names: Ribeiro
+    given-names: Diogo
+    affiliation: ESMAD – Instituto Politécnico do Porto
+    email: dfr@esmad.ipp.pt
+    orcid: "https://orcid.org/0009-0001-2022-7072"
+keywords:
+  - graph algorithms
+  - minimum ratio cycle
+  - parametric search
+  - Bellman–Ford
+  - Stern–Brocot
+  - Python
+  - NumPy
+
+preferred-citation:
+  type: software
+  title: min-ratio-cycle
+  version: 0.1.0
+  authors:
+    - family-names: Ribeiro
+      given-names: Diogo
+      affiliation: ESMAD – Instituto Politécnico do Porto
+      email: dfr@esmad.ipp.pt
+      orcid: "https://orcid.org/0009-0001-2022-7072"
+  license: MIT
+
+references:
+  - type: article
+    title: "Improved Algorithms for Computing the Cycle of Minimum Cost-to-Time Ratio in Directed Graphs"
+    authors:
+      - family-names: Bringmann
+        given-names: Karl
+      - family-names: Hansen
+        given-names: Thomas Dueholm
+      - family-names: Krinninger
+        given-names: Sebastian
+    year: 2017
+    journal: arXiv
+    identifiers:
+      - type: arXiv
+        value: "1704.08122"
+    notes: "Accepted to ICALP 2017"
