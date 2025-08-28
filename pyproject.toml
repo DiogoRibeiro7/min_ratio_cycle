@@ -2,10 +2,36 @@
 name = "min-ratio-cycle"
 version = "0.1.0"
 description = "Minimum cost-to-time ratio cycle solver with NumPy acceleration and exact Stern–Brocot search for integer inputs."
-authors = ["Diogo Ribeiro <dfr@esmad.ipp.pt>"]
 license = "MIT"
 readme = "README.md"
+authors = ["Diogo Ribeiro <dfr@esmad.ipp.pt>"]
+homepage = "https://github.com/DiogoRibeiro7/min-ratio-cycle"
+repository = "https://github.com/DiogoRibeiro7/min-ratio-cycle"
+documentation = "https://min-ratio-cycle.readthedocs.io/en/latest/"
+keywords = [
+"graph algorithms",
+"minimum ratio cycle",
+"parametric search",
+"bellman-ford",
+"stern-brocot",
+"numpy",
+]
+classifiers = [
+"License :: OSI Approved :: MIT License",
+"Programming Language :: Python :: 3",
+"Programming Language :: Python :: 3 :: Only",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
+"Topic :: Scientific/Engineering",
+"Typing :: Typed",
+]
 packages = [{ include = "min_ratio_cycle" }]
+include = [
+"min_ratio_cycle/py.typed",
+"CITATION.cff",
+"LICENSE",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
