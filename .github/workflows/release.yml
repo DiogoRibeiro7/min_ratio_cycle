@@ -4,9 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:  # Manual trigger for testing
+
+permissions:
+  contents: write
+  packages: write
+  issues: read
+  pull-requests: read
 
 jobs:
-  test-matrix:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -19,42 +26,64 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
         run: pip install poetry
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.local/share/pypoetry
-          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ${{ runner.os }}-poetry-${{ matrix.python-version }}-
       - name: Install dependencies
         run: poetry install
       - name: Run tests
         run: poetry run pytest
 
-  build:
-    needs: test-matrix
+  release:
+    needs: test
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install Poetry
         run: pip install poetry
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.local/share/pypoetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ${{ runner.os }}-poetry-
+
       - name: Install dependencies
         run: poetry install
+
       - name: Build package
         run: poetry build
-      - name: Publish to PyPI
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-        run: poetry publish
+
+      - name: Extract release notes
+        id: extract-release-notes
+        run: |
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Create release notes (customize as needed)
+          echo "## Changes in v$VERSION" > release_notes.md
+          echo "" >> release_notes.md
+          echo "See full changelog in the repository." >> release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          token: ${{ secrets.PAT_TOKEN }}
+
+      # - name: Publish to PyPI
+      #   env:
+      #     POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+      #   run: poetry publish
+
+      - name: Trigger Zenodo
+        if: success()
+        run: |
+          echo "Release v${{ steps.extract-release-notes.outputs.version }} published successfully!"
+          echo "Zenodo DOI will be generated automatically if connected."
