@@ -3,7 +3,7 @@
 [![CI](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle/branch/main/graph/badge.svg)](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle)
 [![Documentation](https://readthedocs.org/projects/min-ratio-cycle/badge/?version=latest)](https://min-ratio-cycle.readthedocs.io/en/latest/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.PLACEHOLDER)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17067890.svg)](https://doi.org/10.5281/zenodo.17067890)
 [![PyPI version](https://badge.fury.io/py/min-ratio-cycle.svg)](https://badge.fury.io/py/min-ratio-cycle)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%20|%203.11%20|%203.12-3776AB?logo=python&logoColor=white)](https://python.org)
