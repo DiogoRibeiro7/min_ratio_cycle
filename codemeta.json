@@ -1,0 +1,136 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "min-ratio-cycle",
+  "name": "min-ratio-cycle",
+  "version": "0.1.0",
+  "description": "A high-performance Python library for minimum cost-to-time ratio cycle detection in directed graphs. Features NumPy-accelerated algorithms with exact Stern-Brocot search for integer inputs, comprehensive validation, performance analytics, and visualization tools.",
+  "applicationCategory": "Mathematics, Optimization, Graph Theory",
+  "releaseNotes": "Initial release with core functionality for minimum ratio cycle detection",
+  "funding": [],
+  "developmentStatus": "active",
+  "isPartOf": [],
+  "keywords": [
+    "graph algorithms",
+    "minimum ratio cycle",
+    "parametric search",
+    "Bellman-Ford",
+    "Stern-Brocot",
+    "operations research",
+    "optimization",
+    "Python",
+    "NumPy",
+    "directed graphs",
+    "cycle detection",
+    "computational geometry"
+  ],
+  "programmingLanguage": [
+    "Python"
+  ],
+  "operatingSystem": [
+    "Linux",
+    "Windows",
+    "macOS"
+  ],
+  "softwareRequirements": [
+    "Python >=3.10",
+    "NumPy >=1.25",
+    "matplotlib >=3.7",
+    "networkx >=3.2",
+    "psutil >=7.0"
+  ],
+  "relatedLink": [
+    "https://min-ratio-cycle.readthedocs.io/",
+    "https://pypi.org/project/min-ratio-cycle/"
+  ],
+  "codeRepository": "https://github.com/DiogoRibeiro7/min-ratio-cycle",
+  "contIntegration": "https://github.com/DiogoRibeiro7/min-ratio-cycle/actions",
+  "issueTracker": "https://github.com/DiogoRibeiro7/min-ratio-cycle/issues",
+  "license": "https://spdx.org/licenses/MIT",
+  "readme": "https://github.com/DiogoRibeiro7/min-ratio-cycle/blob/main/README.md",
+  "buildInstructions": "https://github.com/DiogoRibeiro7/min-ratio-cycle/blob/main/CONTRIBUTING.md",
+  "citation": "https://github.com/DiogoRibeiro7/min-ratio-cycle/blob/main/CITATION.cff",
+  "downloadUrl": "https://github.com/DiogoRibeiro7/min-ratio-cycle/releases",
+  "installUrl": "https://pypi.org/project/min-ratio-cycle/",
+  "author": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0009-0001-2022-7072",
+      "givenName": "Diogo",
+      "familyName": "Ribeiro",
+      "email": "dfr@esmad.ipp.pt",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "ESMAD – Instituto Politécnico do Porto"
+      }
+    }
+  ],
+  "copyrightHolder": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0009-0001-2022-7072",
+      "givenName": "Diogo",
+      "familyName": "Ribeiro"
+    }
+  ],
+  "copyrightYear": 2025,
+  "creator": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0009-0001-2022-7072",
+      "givenName": "Diogo",
+      "familyName": "Ribeiro",
+      "email": "dfr@esmad.ipp.pt",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "ESMAD – Instituto Politécnico do Porto"
+      }
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0009-0001-2022-7072",
+      "givenName": "Diogo",
+      "familyName": "Ribeiro",
+      "email": "dfr@esmad.ipp.pt"
+    }
+  ],
+  "contributor": [],
+  "funder": [],
+  "provider": {
+    "@type": "Organization",
+    "name": "GitHub",
+    "url": "https://github.com"
+  },
+  "dateCreated": "2025-01-10",
+  "datePublished": "2025-01-17",
+  "dateModified": "2025-01-17",
+  "embargoDate": null,
+  "isAccessibleForFree": true,
+  "hasSourceCode": "https://github.com/DiogoRibeiro7/min-ratio-cycle",
+  "referencePublication": [],
+  "softwareHelp": [
+    {
+      "@type": "WebSite",
+      "url": "https://min-ratio-cycle.readthedocs.io/"
+    }
+  ],
+  "softwareVersion": "0.1.0",
+  "targetProduct": "Research and industrial optimization applications",
+  "applicationSubCategory": "Scientific Computing, Operations Research",
+  "downloadCount": 0,
+  "installCount": 0,
+  "memoryRequirements": "50-100MB for typical graphs (1000+ vertices)",
+  "processorRequirements": "No specific requirements",
+  "storageRequirements": "< 50MB installed",
+  "supportingData": [],
+  "softwareSuggestions": [
+    "networkx",
+    "scipy",
+    "pandas"
+  ],
+  "issueCount": 0,
+  "starCount": 0,
+  "forkCount": 0
+}

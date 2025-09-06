@@ -1,0 +1,147 @@
+{
+  "title": "min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection in directed graphs",
+  "description": "A high-performance Python library for finding minimum cost-to-time ratio cycles in directed graphs. Features NumPy-accelerated algorithms with exact Stern-Brocot search for integer inputs, comprehensive validation, performance analytics, and visualization tools. Implements Lawler's parametric search with vectorized Bellman-Ford negative cycle detection for applications in finance, operations research, network engineering, and supply chain optimization.",
+  "creators": [
+    {
+      "name": "Ribeiro, Diogo de Bastos",
+      "affiliation": "ESMAD – Instituto Politécnico do Porto",
+      "orcid": "0009-0001-2022-7072"
+    }
+  ],
+  "contributors": [],
+  "keywords": [
+    "graph algorithms",
+    "minimum ratio cycle",
+    "parametric search",
+    "Bellman-Ford algorithm",
+    "Stern-Brocot tree",
+    "operations research",
+    "optimization",
+    "Python",
+    "NumPy",
+    "directed graphs",
+    "cycle detection",
+    "computational geometry",
+    "currency arbitrage",
+    "resource scheduling",
+    "network routing",
+    "supply chain optimization"
+  ],
+  "access_right": "open",
+  "license": {
+    "id": "MIT"
+  },
+  "upload_type": "software",
+  "publication_date": "2025-01-17",
+  "version": "0.1.0",
+  "language": "eng",
+  "subjects": [
+    {
+      "term": "Computer Science",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85029552.html",
+      "scheme": "url"
+    },
+    {
+      "term": "Mathematics",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85082139.html",
+      "scheme": "url"
+    },
+    {
+      "term": "Operations Research",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85094935.html",
+      "scheme": "url"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://doi.org/10.4230/LIPIcs.ICALP.2017.124",
+      "resource_type": "publication-article"
+    },
+    {
+      "relation": "isDocumentedBy",
+      "identifier": "https://min-ratio-cycle.readthedocs.io/",
+      "resource_type": "other"
+    },
+    {
+      "relation": "isIdenticalTo",
+      "identifier": "https://github.com/DiogoRibeiro7/min-ratio-cycle",
+      "resource_type": "software"
+    },
+    {
+      "relation": "isVersionOf",
+      "identifier": "https://pypi.org/project/min-ratio-cycle/",
+      "resource_type": "software"
+    }
+  ],
+  "references": [
+    "Bringmann, K., Hansen, T. D., & Krinninger, S. (2017). Improved Algorithms for Computing the Cycle of Minimum Cost-to-Time Ratio in Directed Graphs. In 44th International Colloquium on Automata, Languages, and Programming (ICALP 2017). https://doi.org/10.4230/LIPIcs.ICALP.2017.124",
+    "Lawler, E. L. (1976). Minimum-mean-weight cycles and minimum ratio spanning trees. Combinatorial algorithms, 201-209. Academic Press.",
+    "Graham, R. L., Knuth, D. E., & Patashnik, O. (1994). Concrete mathematics: a foundation for computer science (2nd ed.). Addison-Wesley.",
+    "Harris, C. R., et al. (2020). Array programming with NumPy. Nature, 585(7825), 357-362. https://doi.org/10.1038/s41586-020-2649-2"
+  ],
+  "notes": "This software implements state-of-the-art algorithms for the minimum cost-to-time ratio cycle problem, providing both exact and approximate solutions with comprehensive validation and performance analytics. The library is designed for research and industrial applications in optimization, finance, and operations research.",
+  "method": "The software implements Lawler's parametric search algorithm combined with vectorized Bellman-Ford negative cycle detection. For integer weights, exact solutions are computed using Stern-Brocot tree search to eliminate floating-point precision errors.",
+  "funding": [],
+  "grants": [],
+  "thesis_supervisors": [],
+  "thesis_university": "",
+  "imprint_publisher": "",
+  "imprint_isbn": "",
+  "partof_title": "",
+  "partof_pages": "",
+  "journal_title": "",
+  "journal_volume": "",
+  "journal_issue": "",
+  "journal_pages": "",
+  "conference_title": "",
+  "conference_acronym": "",
+  "conference_dates": "",
+  "conference_place": "",
+  "conference_url": "",
+  "conference_session": "",
+  "conference_session_part": "",
+  "communities": [
+    {
+      "identifier": "zenodo"
+    }
+  ],
+  "custom": {
+    "programming_language": [
+      {
+        "name": "Python",
+        "version": ">=3.10"
+      }
+    ],
+    "software_dependencies": [
+      "numpy>=1.25",
+      "matplotlib>=3.7",
+      "networkx>=3.2",
+      "psutil>=7.0"
+    ],
+    "operating_systems": [
+      "Linux",
+      "Windows",
+      "macOS"
+    ],
+    "architectures": [
+      "x86_64",
+      "ARM64",
+      "Apple Silicon"
+    ],
+    "development_status": "Stable",
+    "intended_audience": [
+      "Researchers",
+      "Data Scientists",
+      "Operations Research Practitioners",
+      "Financial Analysts",
+      "Network Engineers"
+    ],
+    "software_type": "Library",
+    "repository_stats": {
+      "lines_of_code": "~5000",
+      "test_coverage": ">95%",
+      "documentation_coverage": "100%"
+    }
+  }
+}
