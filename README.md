@@ -537,7 +537,7 @@ Contact: [dfr@esmad.ipp.pt](mailto:dfr@esmad.ipp.pt) for enterprise inquiries.
 
 ### 📜 Citation Information
 
-**Software DOI**: [10.5281/zenodo.PLACEHOLDER](https://doi.org/10.5281/zenodo.PLACEHOLDER)
+**Software DOI**: [10.5281/zenodo.PLACEHOLDER](https://doi.org/10.5281/zenodo.17067890)
 **JOSS Paper**: [10.21105/joss.PLACEHOLDER](https://doi.org/10.21105/joss.PLACEHOLDER)
 **GitHub**: [github.com/DiogoRibeiro7/min-ratio-cycle](https://github.com/DiogoRibeiro7/min-ratio-cycle)
 
