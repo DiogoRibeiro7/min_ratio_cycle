@@ -1,0 +1,27 @@
+name: Task Tracker
+
+on:
+  push:
+    paths:
+      - "tracker.json"
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: DiogoRibeiro7/repo-task-tracker@v1.0.4
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          project-owner: DiogoRibeiro7
+          project-number: ${{ vars.TRACKER_PROJECT_NUMBER }}
+          tracker-path: tracker.json
+          on-orphan: warn

@@ -1,0 +1,222 @@
+{
+  "project_owner": "DiogoRibeiro7",
+  "project_number": 3,
+  "tasks": [
+    {
+      "title": "Document branch and release policy in CONTRIBUTING.md",
+      "description": "Define develop-as-default and main-as-release workflow, including merge, release, and tagging rules.\n\nAcceptance criteria:\n- CONTRIBUTING.md section added\n- branch protection expectations documented\n- release checklist included",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2026",
+        "process",
+        "docs"
+      ]
+    },
+    {
+      "title": "Enforce required CI checks for develop and main",
+      "description": "Configure required checks and merge gates for lint -> test -> docs workflow.\n\nAcceptance criteria:\n- required checks enabled for target branches\n- merge blocked when checks fail\n- documentation updated",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2026",
+        "process",
+        "ci"
+      ]
+    },
+    {
+      "title": "Unify metadata across README, CITATION.cff, and .zenodo.json",
+      "description": "Align URLs, version references, DOI fields, and citation wording across metadata files.\n\nAcceptance criteria:\n- metadata files are cross-consistent\n- validation passes\n- no stale placeholders remain",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2026",
+        "docs",
+        "metadata"
+      ]
+    },
+    {
+      "title": "Automate release checklist for tagging and Zenodo ingestion",
+      "description": "Create a reproducible release process from main with verification steps.\n\nAcceptance criteria:\n- release checklist committed\n- includes tag/release/Zenodo verification steps\n- dry-run documented",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2026",
+        "process",
+        "release"
+      ]
+    },
+    {
+      "title": "Add incremental graph update API to avoid full recomputation",
+      "description": "Introduce API support for small edge updates and partial recomputation paths.\n\nAcceptance criteria:\n- API design approved\n- baseline implementation merged\n- performance comparison included",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q3-2026",
+        "performance",
+        "api"
+      ]
+    },
+    {
+      "title": "Optimize exact mode with Stern-Brocot pruning and early stopping",
+      "description": "Reduce exact-mode solve time while preserving correctness.\n\nAcceptance criteria:\n- pruning strategy implemented\n- correctness tests added\n- benchmark improvement reported",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q3-2026",
+        "performance"
+      ]
+    },
+    {
+      "title": "Create fixed benchmark suite for sparse and dense datasets",
+      "description": "Add stable benchmark corpora and scripts for repeatable performance tracking.\n\nAcceptance criteria:\n- benchmark datasets documented\n- benchmark command/script available\n- regression output format defined",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q3-2026",
+        "performance"
+      ]
+    },
+    {
+      "title": "Define performance regression thresholds in CI",
+      "description": "Guard against unintended slowdowns with threshold-based benchmark checks.\n\nAcceptance criteria:\n- thresholds defined\n- CI integration added\n- failure diagnostics documented",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q3-2026",
+        "ci",
+        "performance"
+      ]
+    },
+    {
+      "title": "Build CLI entrypoint for solve and export workflow",
+      "description": "Provide command-line interface for running solver on input files and exporting results.\n\nAcceptance criteria:\n- CLI command published\n- JSON/CSV output supported\n- usage docs added",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q4-2026",
+        "cli",
+        "ux"
+      ]
+    },
+    {
+      "title": "Improve error diagnostics with actionable context",
+      "description": "Enhance exceptions/messages with edge and vertex context plus recovery guidance.\n\nAcceptance criteria:\n- key errors include actionable hints\n- tests cover diagnostics\n- docs include troubleshooting examples",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q4-2026",
+        "ux"
+      ]
+    },
+    {
+      "title": "Expand docs with domain recipes (finance, routing, scheduling)",
+      "description": "Add scenario-oriented guides and end-to-end examples.\n\nAcceptance criteria:\n- at least 3 recipe pages added\n- examples tested\n- linked from docs index",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q4-2026",
+        "docs",
+        "ux"
+      ]
+    },
+    {
+      "title": "Polish developer onboarding and contribution workflow",
+      "description": "Reduce setup friction and clarify contributor flow.\n\nAcceptance criteria:\n- setup validated on clean environment\n- contribution guide refreshed\n- PR checklist added",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q4-2026",
+        "process",
+        "docs"
+      ]
+    },
+    {
+      "title": "Add stronger NetworkX adapters and conversion helpers",
+      "description": "Improve interoperability with NetworkX graph structures and metadata.\n\nAcceptance criteria:\n- adapter APIs documented\n- conversion tests added\n- performance impact assessed",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q1-2027",
+        "api",
+        "integrations"
+      ]
+    },
+    {
+      "title": "Add optional Jupyter visualization helpers",
+      "description": "Provide notebook-friendly plotting and inspection helpers.\n\nAcceptance criteria:\n- helper module implemented\n- notebook examples added\n- optional dependency behavior documented",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q1-2027",
+        "docs",
+        "integrations"
+      ]
+    },
+    {
+      "title": "Support DIMACS and GraphML import and export utilities",
+      "description": "Implement core format interoperability for graph IO.\n\nAcceptance criteria:\n- DIMACS and GraphML supported\n- round-trip tests added\n- docs/examples updated",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q1-2027",
+        "api",
+        "integrations"
+      ]
+    },
+    {
+      "title": "Ship integration examples for pipeline embedding",
+      "description": "Add templates for integrating solver into existing data pipelines and services.\n\nAcceptance criteria:\n- at least 2 integration templates\n- IO contracts documented\n- sample data included",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q1-2027",
+        "docs",
+        "integrations"
+      ]
+    },
+    {
+      "title": "Prototype parallelized search paths for large instances",
+      "description": "Experiment with parallel execution strategy for heavy workloads.\n\nAcceptance criteria:\n- prototype with benchmark report\n- fallback path retained\n- safety considerations documented",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2027",
+        "performance"
+      ]
+    },
+    {
+      "title": "Introduce precision/performance profiles (fast, balanced, exact)",
+      "description": "Expose profile presets to simplify tuning for common workloads.\n\nAcceptance criteria:\n- profiles implemented\n- behavior documented\n- tests verify settings",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2027",
+        "performance",
+        "api"
+      ]
+    },
+    {
+      "title": "Add experimental approximation mode for very large graphs",
+      "description": "Provide approximation option with bounded/observable error behavior.\n\nAcceptance criteria:\n- mode behind explicit flag\n- tradeoffs documented\n- benchmark comparisons included",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2027",
+        "performance",
+        "api"
+      ]
+    },
+    {
+      "title": "Define and track release KPIs each quarter",
+      "description": "Track runtime, memory, docs health, issue lead time, and release cadence.\n\nAcceptance criteria:\n- KPI reporting template added\n- metrics collected for at least one release\n- targets documented",
+      "status": "planned",
+      "priority": "medium",
+      "labels": [
+        "q2-2027",
+        "process",
+        "performance"
+      ]
+    }
+  ]
+}
