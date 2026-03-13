@@ -306,7 +306,7 @@ If you use this software in academic work, please cite both the software and the
   author = {Diogo de Bastos Ribeiro},
   year = {2025},
   url = {https://github.com/DiogoRibeiro7/min-ratio-cycle},
-  doi = {10.5281/zenodo.PLACEHOLDER},
+  doi = {10.5281/zenodo.17067890},
   version = {0.1.0}
 }
 ```
@@ -324,7 +324,7 @@ If you use this software in academic work, please cite both the software and the
 ```
 
 **Quick Citation** (for informal references):
-> Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection (v0.1.0). *Journal of Open Source Software*. DOI: 10.5281/zenodo.PLACEHOLDER
+> Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection (v0.1.0). *Journal of Open Source Software*. DOI: 10.5281/zenodo.17067890
 
 ---
 
