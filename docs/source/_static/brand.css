@@ -1,0 +1,57 @@
+/* Brand-forward polish for the docs without changing content structure. */
+
+.content .toctree-wrapper > p.caption {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand-content);
+}
+
+/* Landing page hero strip */
+.document h1 {
+  position: relative;
+  margin-bottom: 1.2rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(94, 234, 212, 0.28), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(103, 232, 249, 0.24), transparent 40%),
+    linear-gradient(120deg, rgba(15, 118, 110, 0.12), rgba(11, 114, 133, 0.07));
+  border: 1px solid rgba(11, 114, 133, 0.25);
+}
+
+/* Card-like nav links on index */
+.toctree-wrapper.compound li > a.reference.internal {
+  display: block;
+  margin: 0.4rem 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-background-secondary) 86%, white 14%);
+  border: 1px solid color-mix(in srgb, var(--color-brand-content) 20%, transparent);
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.toctree-wrapper.compound li > a.reference.internal:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, transparent);
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.12);
+}
+
+/* Better callouts and code framing */
+.admonition {
+  border-radius: 12px;
+  border-width: 1px;
+}
+
+div.highlight {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-content) 30%, transparent);
+  overflow: hidden;
+}
+
+/* Slightly stronger active state in sidebar */
+.sidebar-tree .current > a,
+.sidebar-tree .current-page > a {
+  font-weight: 700;
+}
