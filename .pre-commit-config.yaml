@@ -9,7 +9,7 @@ ci:
   autoupdate_schedule: monthly
 
 minimum_pre_commit_version: "3.5.0"
-default_stages: [commit]
+default_stages: [pre-commit]
 
 default_language_version:
   python: python3
@@ -83,7 +83,7 @@ repos:
 
 
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
+    rev: v1.7.7
     hooks:
       - id: docformatter
         args: ["--in-place", "--pre-summary-newline", "--make-summary-multi-line"]
