@@ -67,7 +67,7 @@ jobs:
           echo "See full changelog in the repository." >> release_notes.md
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/*.whl
