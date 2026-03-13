@@ -1,5 +1,5 @@
-Welcome to Min Ratio Cycle's documentation!
-===========================================
+Welcome to min-ratio-cycle documentation
+========================================
 
 .. toctree::
    :maxdepth: 2
