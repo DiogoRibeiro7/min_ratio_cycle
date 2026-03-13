@@ -71,5 +71,7 @@ jobs:
           restore-keys: ${{ runner.os }}-poetry-
       - name: Install dependencies
         run: poetry install
+      - name: Install docs dependencies
+        run: poetry run pip install -r docs/requirements.txt
       - name: Build docs
         run: poetry run sphinx-build -b html docs/source docs/_build/html
