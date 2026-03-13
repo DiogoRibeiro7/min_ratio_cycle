@@ -4,18 +4,21 @@ message: >-
 
 title: "min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection"
 abstract: >-
-  A high-performance Python library for finding minimum cost-to-time ratio 
-  cycles in directed graphs. Features NumPy-accelerated algorithms with 
-  exact Stern-Brocot search for integer inputs, comprehensive validation, 
-  performance analytics, and visualization tools. Implements Lawler's 
+  A high-performance Python library for finding minimum cost-to-time ratio
+  cycles in directed graphs. Features NumPy-accelerated algorithms with
+  exact Stern-Brocot search for integer inputs, comprehensive validation,
+  performance analytics, and visualization tools. Implements Lawler's
   parametric search with vectorized Bellman-Ford negative cycle detection.
 
 version: 0.1.0
 date-released: "2025-01-17"
 license: MIT
 type: software
-repository-code: "https://github.com/DiogoRibeiro7/min-ratio-cycle"
+repository-code: "https://github.com/DiogoRibeiro7/min_ratio_cycle"
 url: "https://min-ratio-cycle.readthedocs.io/"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.17067890"
 
 authors:
   - family-names: Ribeiro
@@ -52,8 +55,9 @@ preferred-citation:
   version: 0.1.0
   date-released: "2025-01-17"
   license: MIT
-  repository-code: "https://github.com/DiogoRibeiro7/min-ratio-cycle"
+  repository-code: "https://github.com/DiogoRibeiro7/min_ratio_cycle"
   url: "https://min-ratio-cycle.readthedocs.io/"
+  doi: "10.5281/zenodo.17067890"
 
 references:
   - type: article
@@ -80,7 +84,7 @@ references:
       - type: arXiv
         value: "1704.08122"
     notes: "Theoretical foundation for the algorithms implemented in this software"
-    
+
   - type: article
     title: "Minimum-mean-weight cycles and minimum ratio spanning trees"
     authors:
@@ -92,7 +96,7 @@ references:
     pages: "201-209"
     publisher: "Academic Press"
     notes: "Original parametric search approach for ratio optimization problems"
-    
+
   - type: book
     title: "Introduction to Algorithms"
     authors:
@@ -145,24 +149,24 @@ contact:
 # Usage examples for different contexts
 citation-examples:
   academic-paper: >-
-    Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio 
-    cycle detection (Version 0.1.0) [Computer software]. 
-    https://github.com/DiogoRibeiro7/min-ratio-cycle
-    
+    Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio
+    cycle detection (Version 0.1.0) [Computer software].
+    https://github.com/DiogoRibeiro7/min_ratio_cycle
+
   bibtex: |
     @software{min_ratio_cycle,
       title = {min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection},
       author = {Diogo de Bastos Ribeiro},
       year = {2025},
       version = {0.1.0},
-      url = {https://github.com/DiogoRibeiro7/min-ratio-cycle},
+      url = {https://github.com/DiogoRibeiro7/min_ratio_cycle},
       note = {Python package for efficient minimum ratio cycle detection}
     }
-    
+
   apa: >-
-    Ribeiro, D. de B. (2025). min-ratio-cycle: Fast minimum cost-to-time 
-    ratio cycle detection (Version 0.1.0) [Computer software]. GitHub. 
-    https://github.com/DiogoRibeiro7/min-ratio-cycle
+    Ribeiro, D. de B. (2025). min-ratio-cycle: Fast minimum cost-to-time
+    ratio cycle detection (Version 0.1.0) [Computer software]. GitHub.
+    https://github.com/DiogoRibeiro7/min_ratio_cycle
 
 # Additional metadata
 commit: "initial-release"
@@ -180,7 +184,7 @@ platforms:
 
 # Documentation and support
 documentation: "https://min-ratio-cycle.readthedocs.io/"
-issue-tracker: "https://github.com/DiogoRibeiro7/min-ratio-cycle/issues"
+issue-tracker: "https://github.com/DiogoRibeiro7/min_ratio_cycle/issues"
 repository-artifact: "https://pypi.org/project/min-ratio-cycle/"
 
 # Quality assurance information
