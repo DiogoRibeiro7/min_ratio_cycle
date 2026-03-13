@@ -1,4 +1,19 @@
 /* Brand-forward polish for the docs without changing content structure. */
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+body {
+  font-family: "Source Sans 3", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Merriweather", Georgia, "Times New Roman", serif;
+  letter-spacing: 0.01em;
+}
 
 .content .toctree-wrapper > p.caption {
   font-size: 0.82rem;
