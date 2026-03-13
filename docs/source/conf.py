@@ -1,11 +1,16 @@
 import os
 import sys
+from importlib import metadata
 
 sys.path.insert(0, os.path.abspath("../.."))
 
-project = "Min Ratio Cycle"
+project = "min-ratio-cycle"
 author = "Diogo Ribeiro"
-release = "0.1.0"
+try:
+    release = metadata.version("min-ratio-cycle")
+except metadata.PackageNotFoundError:
+    release = "dev"
+version = release
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -21,6 +26,7 @@ templates_path = ["_templates"]
 exclude_patterns = []
 
 html_theme = "furo"
+html_title = "min-ratio-cycle documentation"
 html_static_path = ["_static"]
 html_css_files = ["brand.css"]
 
