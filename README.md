@@ -1,6 +1,6 @@
 # min-ratio-cycle
 
-[![CI](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml)
+[![CI](https://github.com/DiogoRibeiro7/min_ratio_cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min_ratio_cycle/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle/branch/main/graph/badge.svg)](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle)
 [![Documentation](https://readthedocs.org/projects/min-ratio-cycle/badge/?version=latest)](https://min-ratio-cycle.readthedocs.io/en/latest/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17067890.svg)](https://doi.org/10.5281/zenodo.17067890)
