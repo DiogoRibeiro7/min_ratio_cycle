@@ -28,13 +28,9 @@
     "supply chain optimization"
   ],
   "access_right": "open",
-  "license": {
-    "id": "MIT"
-  },
+  "license": "MIT",
   "upload_type": "software",
   "publication_date": "2025-01-17",
-  "version": "0.1.0",
-  "language": "eng",
   "subjects": [
     {
       "term": "Computer Science",
@@ -65,7 +61,7 @@
     },
     {
       "relation": "isIdenticalTo",
-      "identifier": "https://github.com/DiogoRibeiro7/min-ratio-cycle",
+      "identifier": "https://github.com/DiogoRibeiro7/min_ratio_cycle",
       "resource_type": "software"
     },
     {
@@ -81,8 +77,6 @@
     "Harris, C. R., et al. (2020). Array programming with NumPy. Nature, 585(7825), 357-362. https://doi.org/10.1038/s41586-020-2649-2"
   ],
   "notes": "This software implements state-of-the-art algorithms for the minimum cost-to-time ratio cycle problem, providing both exact and approximate solutions with comprehensive validation and performance analytics. The library is designed for research and industrial applications in optimization, finance, and operations research.",
-  "method": "The software implements Lawler's parametric search algorithm combined with vectorized Bellman-Ford negative cycle detection. For integer weights, exact solutions are computed using Stern-Brocot tree search to eliminate floating-point precision errors.",
-  "funding": [],
   "grants": [],
   "thesis_supervisors": [],
   "thesis_university": "",
@@ -105,43 +99,5 @@
     {
       "identifier": "zenodo"
     }
-  ],
-  "custom": {
-    "programming_language": [
-      {
-        "name": "Python",
-        "version": ">=3.10"
-      }
-    ],
-    "software_dependencies": [
-      "numpy>=1.25",
-      "matplotlib>=3.7",
-      "networkx>=3.2",
-      "psutil>=7.0"
-    ],
-    "operating_systems": [
-      "Linux",
-      "Windows",
-      "macOS"
-    ],
-    "architectures": [
-      "x86_64",
-      "ARM64",
-      "Apple Silicon"
-    ],
-    "development_status": "Stable",
-    "intended_audience": [
-      "Researchers",
-      "Data Scientists",
-      "Operations Research Practitioners",
-      "Financial Analysts",
-      "Network Engineers"
-    ],
-    "software_type": "Library",
-    "repository_stats": {
-      "lines_of_code": "~5000",
-      "test_coverage": ">95%",
-      "documentation_coverage": "100%"
-    }
-  }
+  ]
 }
