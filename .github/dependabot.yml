@@ -4,9 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    reviewers:
+      - "DiogoRibeiro7"
     open-pull-requests-limit: 10
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    reviewers:
+      - "DiogoRibeiro7"
     open-pull-requests-limit: 10
