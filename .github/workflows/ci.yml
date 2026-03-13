@@ -28,6 +28,7 @@ jobs:
         run: poetry run pre-commit run --show-diff-on-failure --all-files
 
   test:
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,6 +54,7 @@ jobs:
         run: poetry run pytest
 
   docs:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,5 +73,7 @@ jobs:
           restore-keys: ${{ runner.os }}-poetry-
       - name: Install dependencies
         run: poetry install
+      - name: Install docs dependencies
+        run: poetry run pip install -r docs/requirements.txt
       - name: Build docs
         run: poetry run sphinx-build -b html docs/source docs/_build/html
