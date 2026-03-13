@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: DiogoRibeiro7/repo-task-tracker@v1
+      - uses: DiogoRibeiro7/repo-task-tracker@v1.0.4
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           project-owner: DiogoRibeiro7
