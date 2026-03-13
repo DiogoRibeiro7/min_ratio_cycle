@@ -1,13 +1,12 @@
 # min-ratio-cycle
 
-[![CI](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min-ratio-cycle/actions/workflows/ci.yml)
+[![CI](https://github.com/DiogoRibeiro7/min_ratio_cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/min_ratio_cycle/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle/branch/main/graph/badge.svg)](https://codecov.io/gh/DiogoRibeiro7/min-ratio-cycle)
 [![Documentation](https://readthedocs.org/projects/min-ratio-cycle/badge/?version=latest)](https://min-ratio-cycle.readthedocs.io/en/latest/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17067890.svg)](https://doi.org/10.5281/zenodo.17067890)
 [![PyPI version](https://badge.fury.io/py/min-ratio-cycle.svg)](https://badge.fury.io/py/min-ratio-cycle)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%20|%203.11%20|%203.12-3776AB?logo=python&logoColor=white)](https://python.org)
-[![JOSS](https://joss.theoj.org/papers/10.21105/joss.PLACEHOLDER/status.svg)](https://joss.theoj.org/papers/10.21105/joss.PLACEHOLDER)
 
 **Fast, robust, and precise minimum cost-to-time ratio cycle detection for directed graphs.**
 
@@ -15,7 +14,7 @@
 > 🎯 **Precision**: Exact rational arithmetic mode for integer weights
 > 🛡️ **Robustness**: Comprehensive error handling and validation
 > 📊 **Analytics**: Built-in sensitivity analysis and visualization tools
-> 📜 **Citable**: DOI-registered research software with JOSS publication
+> 📜 **Citable**: DOI-registered research software
 
 ---
 
@@ -297,7 +296,7 @@ This implementation is based on the theoretical foundations from:
 
 ### Citation
 
-If you use this software in academic work, please cite both the software and the paper:
+If you use this software in academic work, please cite the software:
 
 **Software Citation:**
 ```bibtex
@@ -311,20 +310,8 @@ If you use this software in academic work, please cite both the software and the
 }
 ```
 
-**JOSS Paper Citation:**
-```bibtex
-@article{Ribeiro2025,
-  title = {min-ratio-cycle: A high-performance Python library for minimum cost-to-time ratio cycle detection in directed graphs},
-  author = {Diogo de Bastos Ribeiro},
-  journal = {Journal of Open Source Software},
-  year = {2025},
-  doi = {10.21105/joss.PLACEHOLDER},
-  url = {https://joss.theoj.org/papers/10.21105/joss.PLACEHOLDER}
-}
-```
-
 **Quick Citation** (for informal references):
-> Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection (v0.1.0). *Journal of Open Source Software*. DOI: 10.5281/zenodo.17067890
+> Ribeiro, D. (2025). min-ratio-cycle: Fast minimum cost-to-time ratio cycle detection (v0.1.0). DOI: 10.5281/zenodo.17067890
 
 ---
 
@@ -358,7 +345,7 @@ This project is licensed under the **MIT License** - see [LICENSE](./LICENSE) fo
 | **Analytics** | 📊 Built-in tools | ❌ None | ⚠️ Limited |
 | **Memory** | 💾 O(V + E) optimized | 💾 O(V!) exponential | 💾 O(V²) general |
 | **Documentation** | 📚 Comprehensive | ❌ None | ⚠️ General purpose |
-| **Citability** | 📜 DOI + JOSS paper | ❌ Not citable | ⚠️ Software only |
+| **Citability** | 📜 DOI | ❌ Not citable | ⚠️ Software only |
 
 ---
 
@@ -369,7 +356,6 @@ This project is licensed under the **MIT License** - see [LICENSE](./LICENSE) fo
 ## 🏆 Recognition & Awards
 
 ### Academic Publications
-- **📜 JOSS Publication**: Peer-reviewed paper in Journal of Open Source Software
 - **🎯 Zenodo Archive**: Permanent DOI for long-term preservation and citability
 - **📊 Research Impact**: Used in academic research across multiple domains
 
@@ -502,7 +488,6 @@ GitHub Stars:        ⭐ 150+
 - **🎯 NumFOCUS Sponsored Project** (Under consideration)
 
 ### Academic Recognition
-- **📜 JOSS Editor's Choice** (Exceptional software quality)
 - **🔬 SciPy Conference** (Featured lightning talk)
 - **🎓 INFORMS** (Operations research community highlight)
 
@@ -538,7 +523,6 @@ Contact: [dfr@esmad.ipp.pt](mailto:dfr@esmad.ipp.pt) for enterprise inquiries.
 ### 📜 Citation Information
 
 **Software DOI**: [10.5281/zenodo.17067890](https://doi.org/10.5281/zenodo.17067890)
-**JOSS Paper**: [10.21105/joss.PLACEHOLDER](https://doi.org/10.21105/joss.PLACEHOLDER)
 **GitHub**: [github.com/DiogoRibeiro7/min-ratio-cycle](https://github.com/DiogoRibeiro7/min-ratio-cycle)
 
 ---
