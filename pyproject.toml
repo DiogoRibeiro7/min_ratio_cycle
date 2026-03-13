@@ -35,7 +35,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numpy = "^1.25"
+numpy = "^2.2"
 matplotlib = "^3.7"  # For benchmark plotting
 networkx = "^3.2"
 psutil = "^7.0"  # Resource monitoring
