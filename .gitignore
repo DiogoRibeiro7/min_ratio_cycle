@@ -17,3 +17,6 @@ build/
 
 # Poetry
 poetry.lock
+
+# Docs build artifacts
+docs/_build/
