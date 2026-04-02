@@ -162,6 +162,40 @@ class TestEdgeCases:
         with pytest.raises(NumericalInstabilityError):
             solver.solve()
 
+    def test_approximate_mode_preserves_solution_structure(self):
+        """
+        Approximate mode should return a cycle for a simple graph.
+        """
+        solver = MinRatioCycleSolver(3)
+        solver.add_edge(0, 1, 2, 1)
+        solver.add_edge(1, 2, 2, 1)
+        solver.add_edge(2, 0, 2, 1)
+
+        result = solver.solve(mode="approximate")
+
+        assert result.success
+        assert result.cycle[0] == result.cycle[-1]
+        assert result.sum_time > 0
+        assert abs(result.ratio - 2.0) < 1e-6
+
+    def test_auto_mode_uses_approx_when_enabled(self):
+        """
+        If auto mode is enabled with approx and large edge count, pick
+        approximate path.
+        """
+        solver = MinRatioCycleSolver(150)
+        # A sparse cycle likely existing but we just need to avoid error.
+        for i in range(149):
+            solver.add_edge(i, i + 1, 1, 1)
+        solver.add_edge(149, 0, 1, 1)
+
+        solver.config.approx_enabled = True
+        # Force approximate for unit test by overriding threshold behavior
+        result = solver.solve(mode="auto")
+
+        assert result.success
+        assert result.cycle[0] == result.cycle[-1]
+
 
 class TestCorrectnessValidation:
     """

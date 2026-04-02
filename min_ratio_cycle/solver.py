@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import math
+import random
 import time
 from dataclasses import dataclass, field
 from enum import Enum
@@ -104,6 +105,12 @@ class SolverConfig:
     use_kahan_summation: bool = True  # For numerical stability
     max_solve_time: float | None = None  # Maximum time in seconds
     max_memory_mb: int | None = None  # Maximum memory usage
+
+    # Approximate mode options (experimental)
+    approx_enabled: bool = True
+    approx_max_samples: int = 5000
+    approx_max_cycle_length: int = 4
+    approx_sample_fraction: float = 0.1  # fraction of edges to sample when large
 
 
 @dataclass(frozen=True)
@@ -633,24 +640,53 @@ class MinRatioCycleSolver:
                     suggested_fix="Add edges to the graph and retry",
                 )
 
-            # Use numeric solver for all cases
-            actual_mode = SolverMode.NUMERIC
+            # Mode selection
+            if mode == SolverMode.AUTO:
+                if (
+                    self.config.approx_enabled
+                    and len(self._edges) > 5000
+                    and self.n > 100
+                ):
+                    actual_mode = SolverMode.APPROXIMATE
+                elif self._all_int:
+                    actual_mode = SolverMode.EXACT
+                else:
+                    actual_mode = SolverMode.NUMERIC
+            else:
+                actual_mode = mode
+
             self.logger.info(f"Starting solve in {actual_mode.value} mode")
 
+            result = None
             try:
-                result = self._solve_numeric(target_ratio=target_ratio, **kwargs)
+                if actual_mode == SolverMode.EXACT:
+                    result = self._solve_exact(**kwargs)
+                elif actual_mode == SolverMode.NUMERIC:
+                    result = self._solve_numeric(target_ratio=target_ratio, **kwargs)
+                elif actual_mode == SolverMode.APPROXIMATE:
+                    result = self._solve_approx(target_ratio=target_ratio, **kwargs)
+                else:
+                    raise ValueError(f"Unknown solver mode: {actual_mode}")
             except (NumericalInstabilityError, ConvergenceError) as e:
-                self.logger.warning("Numeric solve failed: %s", e)
-                if self._all_int:
+                self.logger.warning("%s solve failed: %s", actual_mode.value, e)
+
+                if actual_mode == SolverMode.APPROXIMATE:
+                    self.logger.info(
+                        "Falling back to numeric mode after approximate failure"
+                    )
+                    actual_mode = SolverMode.NUMERIC
+                    result = self._solve_numeric(target_ratio=target_ratio, **kwargs)
+                elif actual_mode == SolverMode.NUMERIC and self._all_int:
                     self.logger.info("Retrying with exact mode")
                     result = self._solve_exact(**kwargs)
-                else:
+                elif actual_mode == SolverMode.NUMERIC:
                     self.logger.info("Relaxing tolerance and retrying")
                     old_tol = self.config.numeric_tolerance
                     self.config.numeric_tolerance *= 10
                     result = self._solve_numeric(target_ratio=target_ratio, **kwargs)
                     self.config.numeric_tolerance = old_tol
-                if not result.success:
+
+                if result is None or not result.success:
                     raise NumericalInstabilityError(
                         "Solver failed in all recovery attempts",
                         component="solve",
@@ -754,6 +790,140 @@ class MinRatioCycleSolver:
                 suggested_fix="Verify integer weights and graph structure; use exact mode when possible.",
                 recovery_hint="Ensure the graph is not disconnected and all edge times are positive.",
             ) from e
+
+    def _solve_approx(
+        self,
+        target_ratio: float | None = None,
+        **kwargs,
+    ) -> SolverResult:
+        """
+        Experimental approximate mode for extremely large graphs.
+
+        This mode does low-cost search over short cycles and heuristics.
+        It may not always return the exact optimal cycle, but aims for
+        speed.
+        """
+        if not self._edges:
+            return SolverResult(
+                cycle=[],
+                sum_cost=0,
+                sum_time=0,
+                ratio=float("inf"),
+                success=False,
+                error_message="Graph has no edges",
+            )
+
+        max_cycle_len = kwargs.get("max_cycle_len", self.config.approx_max_cycle_length)
+        sample_fraction = kwargs.get(
+            "sample_fraction", self.config.approx_sample_fraction
+        )
+        max_samples = kwargs.get("max_samples", self.config.approx_max_samples)
+
+        # Build adjacency maps
+        out_edges: dict[int, list[Edge]] = {}
+        for edge in self._edges:
+            out_edges.setdefault(edge.u, []).append(edge)
+
+        best_ratio = float("inf")
+        best_cycle: list[int] = []
+        best_sum_cost = 0.0
+        best_sum_time = 0.0
+
+        # Always consider self loops and direct cycles of length 2 and 3.
+        for e in self._edges:
+            if e.u == e.v:
+                r = float(e.cost) / float(e.time)
+                if r < best_ratio:
+                    best_ratio = r
+                    best_cycle = [e.u, e.u]
+                    best_sum_cost = float(e.cost)
+                    best_sum_time = float(e.time)
+
+        # Check small cycles from adjacency
+        for u, edge_list in out_edges.items():
+            for e1 in edge_list:
+                v = e1.v
+                if v not in out_edges:
+                    continue
+
+                for e2 in out_edges[v]:
+                    w = e2.v
+
+                    if w == u and max_cycle_len >= 2:
+                        cost = float(e1.cost + e2.cost)
+                        time_ = float(e1.time + e2.time)
+                        if time_ > 0:
+                            r = cost / time_
+                            if r < best_ratio:
+                                best_ratio = r
+                                best_cycle = [u, v, u]
+                                best_sum_cost = cost
+                                best_sum_time = time_
+
+                    if max_cycle_len >= 3 and w in out_edges:
+                        for e3 in out_edges[w]:
+                            x = e3.v
+                            if x == u:
+                                cost = float(e1.cost + e2.cost + e3.cost)
+                                time_ = float(e1.time + e2.time + e3.time)
+                                if time_ > 0:
+                                    r = cost / time_
+                                    if r < best_ratio:
+                                        best_ratio = r
+                                        best_cycle = [u, v, w, u]
+                                        best_sum_cost = cost
+                                        best_sum_time = time_
+
+                    # Sampling additional random short random walks
+                    if len(best_cycle) == 0 or random.random() < sample_fraction:
+                        if max_samples <= 0:
+                            continue
+                        max_samples -= 1
+                        # Random walk of length <= max_cycle_len
+                        walk = [u]
+                        curr = u
+                        visited = {u}
+                        for _ in range(max_cycle_len):
+                            options = out_edges.get(curr, [])
+                            if not options:
+                                break
+                            next_edge = random.choice(options)
+                            curr = next_edge.v
+                            walk.append(curr)
+                            if curr in visited:
+                                cyc_start = walk.index(curr)
+                                cycle_nodes = walk[cyc_start:]
+                                if cycle_nodes[0] != cycle_nodes[-1]:
+                                    cycle_nodes.append(cycle_nodes[0])
+
+                                if len(cycle_nodes) > 1:
+                                    cost, time_ = self._compute_cycle_weights_float(
+                                        cycle_nodes[:-1]
+                                    )
+                                    if time_ > 0:
+                                        r = cost / time_
+                                        if r < best_ratio:
+                                            best_ratio = r
+                                            best_cycle = cycle_nodes
+                                            best_sum_cost = cost
+                                            best_sum_time = time_
+                                break
+                            visited.add(curr)
+
+        if not best_cycle:
+            raise NumericalInstabilityError(
+                "Approximate solver could not find any cycle",
+                component="approximate_solve",
+                suggested_fix="Increase approx_max_samples or use non-approximate mode",
+            )
+
+        return SolverResult(
+            cycle=best_cycle,
+            sum_cost=best_sum_cost,
+            sum_time=best_sum_time,
+            ratio=best_ratio,
+            success=True,
+        )
 
     def _stern_brocot_search(
         self, max_den: int | None, max_steps: int | None
@@ -860,8 +1030,12 @@ class MinRatioCycleSolver:
 
             # Use numerical stable min reduction
             cand_imp = np.where(improve, cand, np.iinfo(np.int64).max)
-            mins = np.minimum.reduceat(cand_imp, self._starts)
-            mins_rep = np.repeat(mins, self._counts)
+            nonempty = self._counts > 0
+            starts_nonempty = self._starts[nonempty]
+            mins = np.minimum.reduceat(cand_imp, starts_nonempty)
+            mins_full = np.full(self.n, np.iinfo(np.int64).max)
+            mins_full[nonempty] = mins
+            mins_rep = np.repeat(mins_full, self._counts)
             good = improve & (cand_imp == mins_rep)
 
             if not np.any(good):
@@ -970,7 +1144,12 @@ class MinRatioCycleSolver:
                 return False
 
             cand_imp = np.where(improve, cand, np.iinfo(np.int64).max)
-            mins = np.minimum.reduceat(cand_imp, self._starts)
+            nonempty = self._counts > 0
+            starts_nonempty = self._starts[nonempty]
+            mins = np.full(self.n, np.iinfo(np.int64).max)
+            if starts_nonempty.size > 0:
+                mins_nonempty = np.minimum.reduceat(cand_imp, starts_nonempty)
+                mins[nonempty] = mins_nonempty
             mins_rep = np.repeat(mins, self._counts)
             good = improve & (cand_imp == mins_rep)
 
