@@ -24,13 +24,19 @@ from typing import Any
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+
+# Compatibility helper for NumPy 2.0 removed `alltrue` alias.
+if not hasattr(np, "alltrue"):
+    np.alltrue = np.all
 import psutil
 
 from min_ratio_cycle.exceptions import (
     ConvergenceError,
+    GraphStructureError,
     NumericalInstabilityError,
     ResourceExhaustionError,
     TimeoutError,
+    format_exception_chain,
 )
 
 # Version and metadata
@@ -617,7 +623,15 @@ class MinRatioCycleSolver:
             self._build_arrays_if_needed()
 
             if not self._edges:
-                raise ValueError("Graph has no edges")
+                raise GraphStructureError(
+                    "Graph has no edges",
+                    graph_properties={
+                        "n_vertices": self.n,
+                        "n_edges": len(self._edges),
+                        "density": 0.0,
+                    },
+                    suggested_fix="Add edges to the graph and retry",
+                )
 
             # Use numeric solver for all cases
             actual_mode = SolverMode.NUMERIC
@@ -669,13 +683,15 @@ class MinRatioCycleSolver:
                 raise RuntimeError(result.error_message)
 
         except TimeoutError as e:
-            self.logger.error("Timeout: %s", e)
+            self.logger.error("Timeout: %s\n%s", e, format_exception_chain(e))
             raise
         except ResourceExhaustionError as e:
-            self.logger.error("Resource limit hit: %s", e)
+            self.logger.error(
+                "Resource limit hit: %s\n%s", e, format_exception_chain(e)
+            )
             raise
         except Exception as e:
-            self.logger.error("Solver exception: %s", e)
+            self.logger.error("Solver exception: %s\n%s", e, format_exception_chain(e))
             raise
 
     # ==============================
@@ -722,14 +738,22 @@ class MinRatioCycleSolver:
             )
 
         except Exception as e:
-            return SolverResult(
-                cycle=[],
-                sum_cost=0,
-                sum_time=0,
-                ratio=float("inf"),
-                success=False,
-                error_message=f"Exact solver failed: {str(e)}",
+            self.logger.error(
+                "Exact solver failed: %s\n%s",
+                e,
+                format_exception_chain(e),
             )
+            raise NumericalInstabilityError(
+                "Exact solver failed",
+                computation_details={
+                    "error": str(e),
+                    "n_vertices": self.n,
+                    "n_edges": len(self._edges),
+                },
+                component="exact_solve",
+                suggested_fix="Verify integer weights and graph structure; use exact mode when possible.",
+                recovery_hint="Ensure the graph is not disconnected and all edge times are positive.",
+            ) from e
 
     def _stern_brocot_search(
         self, max_den: int | None, max_steps: int | None
@@ -1117,8 +1141,24 @@ class MinRatioCycleSolver:
             )
 
         except Exception as e:
+            self.logger.error(
+                "Numeric solver failed: %s\n%s",
+                e,
+                format_exception_chain(e),
+            )
             raise NumericalInstabilityError(
-                "Numeric solver failed", component="numeric_solve"
+                "Numeric solver failed",
+                computation_details={
+                    "lambda_lo": lambda_lo,
+                    "lambda_hi": lambda_hi,
+                    "max_iter": max_iter,
+                    "tolerance": tol,
+                    "slack": slack,
+                    "iterations": iterations,
+                },
+                component="numeric_solve",
+                suggested_fix="Check graph connectivity and weight scaling; set mode=SolverMode.EXACT if all weights are integer.",
+                recovery_hint="Consider lowering numeric_tolerance or increasing max_iter for more stable convergence.",
             ) from e
 
     def _detect_negative_cycle_numeric(

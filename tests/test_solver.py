@@ -17,6 +17,7 @@ from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from min_ratio_cycle.exceptions import (
+    GraphStructureError,
     NumericalInstabilityError,
     ResourceExhaustionError,
 )
@@ -30,19 +31,25 @@ class TestEdgeCases:
 
     def test_empty_graph(self):
         """
-        Graph with no edges should raise appropriate error.
+        Graph with no edges should raise structured graph error.
         """
         solver = MinRatioCycleSolver(3)
-        with pytest.raises(ValueError, match="Graph has no edges"):
+        with pytest.raises(GraphStructureError, match="Graph has no edges") as exc:
             solver.solve()
+
+        assert exc.value.details.get("n_vertices") == 3
+        assert exc.value.details.get("n_edges") == 0
 
     def test_single_vertex(self):
         """
-        Single vertex with no edges.
+        Single vertex with no edges should raise structured graph error.
         """
         solver = MinRatioCycleSolver(1)
-        with pytest.raises(ValueError, match="Graph has no edges"):
+        with pytest.raises(GraphStructureError, match="Graph has no edges") as exc:
             solver.solve()
+
+        assert exc.value.details.get("n_vertices") == 1
+        assert exc.value.details.get("n_edges") == 0
 
     def test_zero_vertices_invalid(self):
         """
@@ -63,8 +70,11 @@ class TestEdgeCases:
 
         from min_ratio_cycle.exceptions import NumericalInstabilityError
 
-        with pytest.raises(NumericalInstabilityError):
+        with pytest.raises(NumericalInstabilityError) as exc:
             solver.solve()
+
+        assert "suggested_fix" in exc.value.details
+        assert "recovery_hint" in exc.value.details
 
     def test_self_loop(self):
         """
